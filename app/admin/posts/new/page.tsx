@@ -18,7 +18,7 @@ function PostEditor() {
   const [author, setAuthor] = useState("Rugumaho");
   const [status, setStatus] = useState<"draft" | "published">("draft");
   const [readTime, setReadTime] = useState("5 min read");
-  const [category, setCategory] = useState("Lifestyle");
+  const [category, setCategory] = useState<'Motherhood' | 'Travel' | 'Fitness' | 'Lifestyle'>("Lifestyle");
   const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
@@ -223,14 +223,13 @@ function PostEditor() {
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Category</label>
               <select
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => setCategory(e.target.value as 'Motherhood' | 'Travel' | 'Fitness' | 'Lifestyle')}
                 className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm"
               >
                 <option value="Lifestyle">Lifestyle</option>
-                <option value="Home">Home</option>
-                <option value="Wellness">Wellness</option>
                 <option value="Travel">Travel</option>
-                <option value="Other">Other</option>
+                <option value="Fitness">Fitness</option>
+                <option value="Motherhood">Motherhood</option>
               </select>
             </div>
 
