@@ -116,29 +116,7 @@ export default function AdminNewsletterPage() {
   // Calculate display count matching the HTML metric
   const displayTotalSubscribers = 12438 + activeSubscribersCount;
 
-  const handleSendCampaign = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!subject.trim() || !content.trim()) {
-      alert("Subject and Content are required.");
-      return;
-    }
 
-    const newCampaign: Campaign = {
-      id: Math.random().toString(36).substr(2, 9),
-      title: subject,
-      sentDate: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-      recipients: activeSubscribersCount + 11200,
-      openRate: "0.0%",
-      clickRate: "0.0%"
-    };
-
-    setCampaigns([newCampaign, ...campaigns]);
-    setShowComposeModal(false);
-    setSubject("");
-    setPreheader("");
-    setContent("");
-    triggerToast("Campaign sent to subscribers successfully!");
-  };
 
   const toggleSubscriberStatus = (id: string) => {
     setSubscribers(subscribers.map(s => 
