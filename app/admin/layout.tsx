@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, FileText, PlusCircle, LogOut, ArrowLeft, Menu, X } from "lucide-react";
+import { LayoutDashboard, Mail, LogOut, BookOpen, X, Menu, Flower } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -19,8 +19,10 @@ export default function AdminLayout({
     // Check if auth cookie exists
     const checkAuth = () => {
       const isLoggedIn = document.cookie.includes("rugumaho_admin_auth=true");
-      if (!isLoggedIn) {
-        router.push("/admin/login");
+      if (pathname === "/admin/login") {
+        setAuthorized(true);
+      } else if (!isLoggedIn) {
+        router.push("/admin/login?key=ariane-secret-token");
       } else {
         setAuthorized(true);
       }
@@ -35,26 +37,35 @@ export default function AdminLayout({
     router.push("/");
   };
 
+  if (
+    pathname === "/admin/login" || 
+    pathname?.startsWith("/admin/posts/new") || 
+    pathname?.startsWith("/admin/newsletter/new")
+  ) {
+    return <>{children}</>;
+  }
+
   if (!authorized) {
     return (
-      <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center">
-        <div className="text-slate-400">Verifying authorization...</div>
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex items-center justify-center font-sans">
+        <div className="text-slate-400 text-sm font-semibold">Verifying authorization...</div>
       </div>
     );
   }
 
   const navItems = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { name: "Manage Posts", href: "/admin/posts", icon: FileText },
-    { name: "Create Post", href: "/admin/posts/new", icon: PlusCircle },
+    { name: "Newsletter", href: "/admin/newsletter", icon: Mail },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex font-sans">
+    <div className="flex h-screen overflow-hidden bg-slate-50 font-display text-slate-900">
+      
       {/* Mobile Sidebar Toggle Button */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="lg:hidden fixed bottom-6 right-6 z-50 p-4 rounded-full bg-indigo-600 text-white shadow-xl hover:bg-indigo-500 transition-colors"
+        className="lg:hidden fixed bottom-6 right-6 z-50 p-4 rounded-full bg-primary text-white shadow-xl hover:opacity-90 active:scale-95 transition-all cursor-pointer flex items-center justify-center"
+        aria-label="Toggle navigation menu"
       >
         {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </button>
@@ -63,29 +74,25 @@ export default function AdminLayout({
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
-          className="lg:hidden fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm"
+          className="lg:hidden fixed inset-0 z-40 bg-slate-900/30 backdrop-blur-sm"
         />
       )}
 
-      {/* Sidebar Navigation */}
+      {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-slate-950 border-r border-slate-800 p-6 flex flex-col justify-between transform transition-transform duration-300 lg:transform-none ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 transform transition-transform duration-300 lg:transform-none ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="space-y-8">
-          {/* Logo */}
-          <Link href="/admin/dashboard" className="flex items-center gap-2 px-2">
-            <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-white shadow-md shadow-indigo-600/10">
-              R
-            </div>
-            <span className="font-extrabold text-lg bg-clip-text text-transparent bg-gradient-to-r from-slate-50 to-slate-200">
-              Rugumaho <span className="text-indigo-400">Admin</span>
-            </span>
-          </Link>
-
-          {/* Nav Links */}
-          <nav className="space-y-1.5">
+        <div className="flex flex-col">
+          {/* Logo Header */}
+          <div className="p-8 flex items-center gap-3">
+            <Flower className="text-primary w-8 h-8 shrink-0" />
+            <h1 className="font-serif text-2xl font-bold tracking-tight text-slate-800">Rugumaho</h1>
+          </div>
+          
+          {/* Navigation Links */}
+          <nav className="flex flex-col gap-1 px-4">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -94,44 +101,46 @@ export default function AdminLayout({
                   key={item.href}
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  className={`relative flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                     isActive
-                      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/10"
-                      : "text-slate-400 hover:bg-slate-900 hover:text-white"
+                      ? "bg-primary/10 text-primary before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-primary before:rounded-r-lg"
+                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
-                  <span>{item.name}</span>
+                  <Icon className="w-5 h-5" />
+                  <span className="text-sm font-medium">{item.name}</span>
                 </Link>
               );
             })}
           </nav>
         </div>
 
-        {/* Footer actions */}
-        <div className="space-y-2 pt-6 border-t border-slate-900">
-          <Link
-            href="/"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:bg-slate-900 hover:text-white transition-all"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Go to Blog</span>
-          </Link>
+        {/* Footer info and logout */}
+        <div className="p-4 border-t border-slate-100">
+          <div className="flex items-center gap-3 px-4 py-3">
+            <img 
+              className="w-10 h-10 rounded-full object-cover border border-slate-200" 
+              alt="User avatar of Ariane" 
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAot0CfIGSP0ePMPx8RhsKrHib5Ilicb7ExC-mnkh9SeEky65sqhFLJw2BsSftAarX5sCXmNlRwApy3IIqmqvFiik_riZHC94s-Q7A7yhE2n0DwEEfIxcz5WdERXtI1Cxr9aNvx8sr3dq4NOo7rKiJ8TjndYuHFTtEx3jmSBRuajEpaBewgoVPwGKDomlJegbsdvg9sGbGDZrsIej_0M-tCZUjp302UFWtJXwt-2TVPGJhXxfROU9qQiBvoCCNaiLHDNUxx8qO0-l0"
+            />
+            <div className="flex flex-col overflow-hidden">
+              <p className="text-sm font-semibold text-slate-800 truncate">Ariane</p>
+              <p className="text-xs text-slate-500 truncate">Administrator</p>
+            </div>
+          </div>
           <button
             onClick={handleSignOut}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-all cursor-pointer text-left"
+            className="w-full flex items-center gap-3 px-4 py-2 mt-2 rounded-lg text-slate-500 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer text-left"
           >
-            <LogOut className="w-4 h-4" />
-            <span>Sign Out</span>
+            <LogOut className="w-5 h-5" />
+            <span className="text-sm font-medium">Log out</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 lg:max-h-screen lg:overflow-y-auto px-6 py-8 sm:px-8">
-        <div className="max-w-5xl mx-auto">
-          {children}
-        </div>
+      <main className="flex-1 overflow-y-auto bg-slate-50/50">
+        {children}
       </main>
     </div>
   );
