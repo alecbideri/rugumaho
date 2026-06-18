@@ -15,11 +15,13 @@ export default function AdminLayout({
   const [authorized, setAuthorized] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const cleanPath = pathname?.replace(/\/$/, "") || "";
+
   useEffect(() => {
     // Check if auth cookie exists
     const checkAuth = () => {
       const isLoggedIn = document.cookie.includes("rugumaho_admin_auth=true");
-      if (pathname === "/admin/login") {
+      if (cleanPath === "/admin/login") {
         setAuthorized(true);
       } else if (!isLoggedIn) {
         router.push("/admin/login?key=ariane-secret-token");
@@ -29,7 +31,7 @@ export default function AdminLayout({
     };
     
     checkAuth();
-  }, [router, pathname]);
+  }, [router, cleanPath]);
 
   const handleSignOut = () => {
     // Expire cookie
@@ -38,9 +40,9 @@ export default function AdminLayout({
   };
 
   if (
-    pathname === "/admin/login" || 
-    pathname?.startsWith("/admin/posts/new") || 
-    pathname?.startsWith("/admin/newsletter/new")
+    cleanPath === "/admin/login" || 
+    cleanPath.startsWith("/admin/posts/new") || 
+    cleanPath.startsWith("/admin/newsletter/new")
   ) {
     return <>{children}</>;
   }
