@@ -18,7 +18,8 @@ import {
   Calendar,
   X,
   FileText,
-  Flower
+  Flower,
+  Mail
 } from "lucide-react";
 
 export default function ComposeNewsletterPage() {
