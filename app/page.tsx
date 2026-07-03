@@ -2,13 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getPosts, Post } from "../lib/mockData";
+import { getPosts, Post, addSubscriber, getBlogSettings, BlogSettings } from "../lib/mockData";
 import { 
   Camera, 
   ArrowRight, 
   Mail, 
   Calendar, 
-  X
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Sparkles
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -21,16 +24,26 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [settings, setSettings] = useState<BlogSettings>({ heroLayout: 'carousel' });
+  const [activeSlide, setActiveSlide] = useState(0);
 
   // Email subscribe state
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
   useEffect(() => {
-    const fetched = getPosts().filter(p => p.status === "published");
-    setAllPosts(fetched);
-    setPosts(fetched);
-    setMounted(true);
+    getPosts().then((fetched) => {
+      const published = fetched.filter(p => p.status === "published");
+      setAllPosts(published);
+      setPosts(published);
+      setMounted(true);
+    });
+
+    getBlogSettings().then((data) => {
+      setSettings(data);
+    }).catch((err) => {
+      console.error("Failed to load settings:", err);
+    });
   }, []);
 
   // Filter posts based on category and search
@@ -67,11 +80,51 @@ export default function Home() {
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      setSubscribed(true);
-      setEmail("");
-      setTimeout(() => setSubscribed(false), 5000);
+      addSubscriber({
+        name: email.split("@")[0],
+        email,
+        status: "Active"
+      }).then(() => {
+        setSubscribed(true);
+        setEmail("");
+        setTimeout(() => setSubscribed(false), 5000);
+      }).catch(err => {
+        console.error("Failed to subscribe in Sanity:", err);
+        // Fallback to visual success state even on error to preserve UX
+        setSubscribed(true);
+        setEmail("");
+        setTimeout(() => setSubscribed(false), 5000);
+      });
     }
   };
+
+  // Determine what stories to display in the Hero Section
+  const heroPosts = (() => {
+    if (settings.heroLayout === "single" && settings.selectedHeroPostId) {
+      const selected = posts.find(p => p.id === settings.selectedHeroPostId);
+      if (selected) return [selected];
+    }
+    const featured = posts.filter(p => p.isFeatured === true);
+    if (featured.length > 0) return featured;
+    return posts.length > 0 ? [posts[0]] : [];
+  })();
+
+  const handlePrevSlide = () => {
+    setActiveSlide(prev => (prev === 0 ? heroPosts.length - 1 : prev - 1));
+  };
+
+  const handleNextSlide = () => {
+    setActiveSlide(prev => (prev === heroPosts.length - 1 ? 0 : prev + 1));
+  };
+
+  // Carousel auto-rotate effect
+  useEffect(() => {
+    if (heroPosts.length <= 1) return;
+    const interval = setInterval(() => {
+      handleNextSlide();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroPosts.length, activeSlide]);
 
   // Extract categories for filter
   const categories = Array.from(new Set(allPosts.map(p => p.category).filter(Boolean))) as string[];
@@ -115,66 +168,95 @@ export default function Home() {
               </div>
             )}
 
-            {/* Hero Section */}
-            {!selectedCategory && !appliedSearch && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                {/* Hero Image */}
-                <Link 
-                  href="/posts/the-hidden-gems-of-rwandas-countryside"
-                  className="relative w-full aspect-[4/3] lg:aspect-square overflow-hidden rounded-xl shadow-lg group block cursor-pointer"
-                >
-                  <div 
-                    className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
-                    style={{ backgroundImage: `url("https://lh3.googleusercontent.com/aida-public/AB6AXuANbxS57_IPytnQiJMyuZ3-JJ3KWHsdqwf3ZsUDwJIOgbglomTaZU27u7dkvqlIu8aqxPbnQctB_YoJ_OyWTtqScRYaxkQq8ktVCU4O7XjONODb4w2EYEBJ1zfdYc14ohKqAzhC2wwftEmYBL2Yb8UicXXORo0J1PONmAKiw84SQJj1lMZrF41P9tVU5GfCZqZfGVW9FRUBmq5i31vrCOcgAQNsdgm50481IL1sBsV4PdqmR2fFzh3BI-p2Ux-GfwybRsvm0pcF2cQ")` }}
-                  ></div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60"></div>
-                  <div className="absolute bottom-6 left-6 text-white flex items-center gap-2">
-                    <Camera className="w-5 h-5 text-primary" />
-                    <span className="text-sm font-medium">Featured Living</span>
-                  </div>
-                </Link>
+            {/* Dynamic Hero Carousel/Single Section */}
+            {mounted && !selectedCategory && !appliedSearch && heroPosts.length > 0 && (
+              <div className="w-full flex flex-col gap-6">
+                <div className="relative w-full overflow-hidden rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl p-6 lg:p-10">
+                  {heroPosts.map((post, idx) => {
+                    const isActive = idx === activeSlide;
+                    return (
+                      <div 
+                        key={post.id} 
+                        className={`grid grid-cols-1 lg:grid-cols-2 gap-8 items-center transition-all duration-700 ease-in-out ${
+                          isActive ? "opacity-100 translate-x-0 relative" : "opacity-0 translate-x-4 absolute inset-0 pointer-events-none hidden"
+                        }`}
+                      >
+                        {/* Hero Image */}
+                        <Link 
+                          href={`/posts/${post.slug}`}
+                          className="relative w-full aspect-[4/3] lg:aspect-square overflow-hidden rounded-xl shadow-lg group block cursor-pointer"
+                        >
+                          <div 
+                            className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
+                            style={{ backgroundImage: `url("${post.coverImage || "https://images.unsplash.com/photo-1499750310107-5fef28a66643"}")` }}
+                          ></div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60"></div>
+                          <div className="absolute bottom-6 left-6 text-white flex items-center gap-2">
+                            <Camera className="w-5 h-5 text-primary" />
+                            <span className="text-sm font-semibold">{post.category || "Featured Journal"}</span>
+                          </div>
+                        </Link>
 
-                {/* Hero Content */}
-                <div className="flex flex-col gap-6 lg:pl-10 justify-center">
-                  <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
-                    <span className="w-8 h-px bg-primary"></span>
-                    Editor&apos;s Pick
-                  </div>
-                  <Link href="/posts/the-hidden-gems-of-rwandas-countryside" className="group">
-                    <h1 className="text-slate-900 dark:text-white text-5xl lg:text-6xl font-serif font-medium leading-[1.1] tracking-tight group-hover:text-primary transition-colors">
-                      The Hidden Gems <br/>
-                      of Rwanda&apos;s <span className="text-slate-400 dark:text-slate-500 italic">Countryside</span>
-                    </h1>
-                  </Link>
-                  <p className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed max-w-md">
-                    Beyond the typical tourist trails lies a world of vibrant markets, ancient traditions, and a serenity that can only be found by slowing down.
-                  </p>
-                  <div className="flex flex-wrap gap-4 pt-4">
-                    <Link 
-                      href="/posts/the-hidden-gems-of-rwandas-countryside"
-                      className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary hover:text-slate-900 dark:hover:bg-primary transition-all rounded-lg h-12 px-8 text-sm font-bold flex items-center gap-2 group cursor-pointer shadow-md"
-                    >
-                      Read Latest Journal
-                      <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-1 transition-transform" />
-                    </Link>
+                        {/* Hero Content */}
+                        <div className="flex flex-col gap-6 lg:pl-10 justify-center">
+                          <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
+                            <span className="w-8 h-px bg-primary"></span>
+                            {post.isFeatured ? "Featured Story" : "Latest Post"}
+                          </div>
+                          <Link href={`/posts/${post.slug}`} className="group">
+                            <h1 className="text-slate-900 dark:text-white text-4xl lg:text-5xl font-serif font-medium leading-[1.2] tracking-tight group-hover:text-primary transition-colors line-clamp-3">
+                              {post.title}
+                            </h1>
+                          </Link>
+                          <p className="text-slate-650 dark:text-slate-350 text-base lg:text-lg leading-relaxed max-w-md line-clamp-3 font-light">
+                            {post.excerpt}
+                          </p>
+                          <div className="flex flex-wrap gap-4 pt-4">
+                            <Link 
+                              href={`/posts/${post.slug}`}
+                              className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary hover:text-slate-900 dark:hover:bg-primary transition-all rounded-lg h-12 px-8 text-sm font-bold flex items-center gap-2 group cursor-pointer shadow-md"
+                            >
+                              Read Journal
+                              <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-1 transition-transform" />
+                            </Link>
+                            <button 
+                              onClick={() => {
+                                const target = document.getElementById("stories-grid-anchor");
+                                if (target) target.scrollIntoView({ behavior: "smooth" });
+                              }}
+                              className="border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white hover:border-primary hover:text-primary rounded-lg h-12 px-6 text-sm font-bold transition-all cursor-pointer"
+                            >
+                              View Archives
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Navigation controls for Carousel */}
+                {heroPosts.length > 1 && (
+                  <div className="flex justify-center items-center gap-6">
                     <button 
-                      onClick={() => {
-                        const target = document.getElementById("stories-grid-anchor");
-                        if (target) target.scrollIntoView({ behavior: "smooth" });
-                      }}
-                      className="border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white hover:border-primary hover:text-primary rounded-lg h-12 px-6 text-sm font-bold transition-all cursor-pointer"
+                      onClick={handlePrevSlide}
+                      className="size-10 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-primary hover:text-slate-900 dark:hover:bg-primary transition-all flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 active:scale-95"
+                      aria-label="Previous Slide"
                     >
-                      View Archives
+                      <ChevronLeft className="w-5.5 h-5.5" />
+                    </button>
+                    <span className="text-sm font-bold text-slate-500 dark:text-slate-400 select-none">
+                      {activeSlide + 1} / {heroPosts.length}
+                    </span>
+                    <button 
+                      onClick={handleNextSlide}
+                      className="size-10 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-primary hover:text-slate-900 dark:hover:bg-primary transition-all flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 active:scale-95"
+                      aria-label="Next Slide"
+                    >
+                      <ChevronRight className="w-5.5 h-5.5" />
                     </button>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {/* Decorative Divider */}
-            {!selectedCategory && !appliedSearch && (
-              <div className="w-full flex justify-center py-4 text-slate-300 dark:text-slate-700 text-xl font-bold tracking-widest">
-                •••
+                )}
               </div>
             )}
 
@@ -194,11 +276,17 @@ export default function Home() {
             </div>
 
             {mounted && posts.length === 0 ? (
-              <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700">
-                <p className="text-slate-400">No articles found matching your criteria.</p>
-                <button onClick={clearFilters} className="mt-4 px-4 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-500 font-semibold text-xs text-white">
-                  Clear Filters
-                </button>
+              <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700 w-full">
+                <p className="text-slate-400 font-medium animate-pulse">
+                  {selectedCategory || appliedSearch 
+                    ? "No articles found matching your criteria." 
+                    : "No articles published yet. Check back soon!"}
+                </p>
+                {(selectedCategory || appliedSearch) && (
+                  <button onClick={clearFilters} className="mt-4 px-4 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-500 font-semibold text-xs text-white cursor-pointer">
+                    Clear Filters
+                  </button>
+                )}
               </div>
             ) : (
               <>

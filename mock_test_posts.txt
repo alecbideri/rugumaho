@@ -1,0 +1,94 @@
+================================================================================
+TEST POST 1: TRAVEL
+================================================================================
+
+TITLE:
+The Hidden Gems of Rwanda's Countryside
+
+EXCERPT:
+Beyond the typical tourist trails lies a world of vibrant markets, ancient traditions, and a serenity that can only be found by slowing down.
+
+CATEGORY:
+Travel
+
+TAGS:
+Guides, Adventure
+
+COVER IMAGE URL:
+https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1200&q=80
+
+CONTENT (Plain Text - Copy and use the editor toolbar to style it):
+A Journey Through the Mist
+
+Traveling north toward the volcanoes, the air grows crisp and the greenery becomes impossibly deep. It is here that the true spirit of Rwanda resides. We spent four days navigating the narrow pathways of the Northern Province, where every turn reveals a new panorama of volcanic peaks and mirror-like lakes.
+
+"The silence of the countryside isn't an absence of sound, but a presence of peace that vibrates through the very ground beneath your feet."
+
+What strikes visitors first is the impeccable order. Even in the most remote villages, the sense of community and collective responsibility—Umuganda—is palpable. We encountered local cooperatives dedicated to sustainable honey production and weaving, each telling a story of resilience and hope.
+
+Essentials for Your Backpack:
+- Lightweight, waterproof layers for the sudden tropical rains.
+- Sturdy walking boots for the steep, terraced inclines.
+- A high-quality camera to capture the extraordinary play of light and shadow.
+
+================================================================================
+TEST POST 2: LIFESTYLE
+================================================================================
+
+TITLE:
+Cultivating Mindful Habits for a Silent Morning
+
+EXCERPT:
+How waking up just thirty minutes earlier to sit in quiet contemplation can transform your focus, lower your stress, and anchor your day.
+
+CATEGORY:
+Lifestyle
+
+TAGS:
+Tips, Wellness
+
+COVER IMAGE URL:
+https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80
+
+CONTENT (Plain Text - Copy and use the editor toolbar to style it):
+Morning Stillness in a Loud World
+
+The first hour of the day is the rudder of the mind. In the quiet before emails, notifications, and demands roll in, we have a unique window to anchor ourselves. Waking up earlier to sit in stillness sets a positive intention for the hours ahead.
+
+"Stillness is not the absence of movement, but the presence of absolute focus."
+
+3 Morning Habits to Try:
+1. No Screens for 30 Mins: Resist the urge to check your phone immediately. Let your brain wake up naturally.
+2. Drink Water First: Hydrate your body to signal your organs that it's time to activate.
+3. Sit in Silence: Spend five minutes just observing your breath. Notice the thoughts that float by without catching onto them.
+
+================================================================================
+TEST POST 3: FITNESS & WELLNESS
+================================================================================
+
+TITLE:
+A Beginner's Guide to Functional Strength Training
+
+EXCERPT:
+Why training for movement patterns rather than isolated muscles is the key to longevity, joint health, and feeling energized every single day.
+
+CATEGORY:
+Fitness
+
+TAGS:
+Wellness, Tips, Guides
+
+CONTENT (Plain Text - Copy and use the editor toolbar to style it):
+Training for Movement, Not Muscle
+
+Functional strength training is all about preparing your body for daily life. Instead of sitting on machines that isolate one muscle at a time, functional training focuses on movements that teach your muscles to work together. This builds a body that is resilient, balanced, and ready for anything.
+
+"Strength isn't just about how much you can lift in a controlled environment; it's about how gracefully and safely you move through your environment."
+
+The 5 Core Movement Patterns to Master:
+- Squat: Bending at the hips and knees (e.g., sitting down, lifting up).
+- Hinge: Bending at the hips with a flat back (e.g., picking up a heavy box).
+- Push: Pushing weight away from your chest (e.g., push-ups, heavy doors).
+- Pull: Pulling weight toward your body (e.g., rows, carrying groceries).
+- Carry: Walking with load (e.g., farmer's walk, suitcase carrying).
+

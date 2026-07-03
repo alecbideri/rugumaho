@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { getSubscribers, toggleSubscriberStatus as toggleSubscriberStatusApi, deleteSubscriber as deleteSubscriberApi, getCampaigns } from "../../../lib/mockData";
 import { 
   Search, 
   Plus, 
@@ -25,7 +26,7 @@ interface Subscriber {
   id: string;
   name: string;
   email: string;
-  subscribedDate: string;
+  subscribedDate?: string;
   status: "Active" | "Unsubscribed";
 }
 
@@ -72,19 +73,19 @@ export default function AdminNewsletterPage() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [showToast, setShowToast] = useState<string | null>(null);
 
-  // Load campaigns from localStorage
+  // Load campaigns and subscribers from Sanity
   useEffect(() => {
-    const saved = localStorage.getItem("rugumaho_campaigns");
-    if (!saved) {
-      localStorage.setItem("rugumaho_campaigns", JSON.stringify(INITIAL_CAMPAIGNS));
-      setCampaigns(INITIAL_CAMPAIGNS);
-    } else {
-      try {
-        setCampaigns(JSON.parse(saved));
-      } catch (e) {
-        setCampaigns(INITIAL_CAMPAIGNS);
-      }
-    }
+    getSubscribers().then(data => {
+      setSubscribers(data);
+    }).catch(err => {
+      console.error("Failed to load subscribers:", err);
+    });
+
+    getCampaigns().then(data => {
+      setCampaigns(data);
+    }).catch(err => {
+      console.error("Failed to load campaigns:", err);
+    });
   }, []);
 
   // Reset page when search changes
@@ -118,19 +119,25 @@ export default function AdminNewsletterPage() {
 
 
 
-  const toggleSubscriberStatus = (id: string) => {
-    setSubscribers(subscribers.map(s => 
-      s.id === id ? { ...s, status: s.status === "Active" ? "Unsubscribed" : "Active" } : s
-    ));
-    setActiveDropdown(null);
-    triggerToast("Subscriber status toggled!");
+  const toggleSubscriberStatus = (id: string, currentStatus: "Active" | "Unsubscribed") => {
+    toggleSubscriberStatusApi(id, currentStatus).then(() => {
+      getSubscribers().then(data => setSubscribers(data));
+      setActiveDropdown(null);
+      triggerToast("Subscriber status toggled!");
+    }).catch(err => {
+      console.error("Error toggling subscriber status:", err);
+    });
   };
 
   const deleteSubscriber = (id: string) => {
     if (confirm("Are you sure you want to remove this subscriber?")) {
-      setSubscribers(subscribers.filter(s => s.id !== id));
-      setActiveDropdown(null);
-      triggerToast("Subscriber removed!");
+      deleteSubscriberApi(id).then(() => {
+        getSubscribers().then(data => setSubscribers(data));
+        setActiveDropdown(null);
+        triggerToast("Subscriber removed!");
+      }).catch(err => {
+        console.error("Error deleting subscriber:", err);
+      });
     }
   };
 
@@ -302,7 +309,7 @@ export default function AdminNewsletterPage() {
                             />
                             <div className="absolute right-6 top-10 w-44 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-lg py-1 z-30 animate-in fade-in slide-in-from-top-1 duration-150">
                               <button
-                                onClick={() => toggleSubscriberStatus(sub.id)}
+                                onClick={() => toggleSubscriberStatus(sub.id, sub.status)}
                                 className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-medium text-slate-700 dark:text-slate-200 flex items-center gap-2"
                               >
                                 <Mail className="w-3.5 h-3.5" />

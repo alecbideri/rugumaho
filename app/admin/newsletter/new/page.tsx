@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { addCampaign } from "../../../../lib/mockData";
 import { 
   Bold, 
   Italic, 
@@ -120,45 +121,23 @@ export default function ComposeNewsletterPage() {
       return;
     }
 
-    const currentMonthYear = new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" });
+    const currentMonthYear = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
     
-    // Create new campaign
-    const newCampaign = {
-      id: Math.random().toString(36).substr(2, 9),
+    addCampaign({
       title: subject,
       sentDate: currentMonthYear,
-      recipients: 12450, // mock count
+      recipients: 12450,
       openRate: "0.0%",
       clickRate: "0.0%"
-    };
-
-    // Load existing campaigns, append new one, and write to localStorage
-    const INITIAL_CAMPAIGNS = [
-      { id: "1", title: "The Future of Sustainable Design", sentDate: "Oct 24, 2023", recipients: 11200, openRate: "72.4%", clickRate: "12.1%" },
-      { id: "2", title: "Summer Product Update: V2 is here", sentDate: "Sep 15, 2023", recipients: 10840, openRate: "64.2%", clickRate: "8.5%" }
-    ];
-    
-    let currentCampaigns = INITIAL_CAMPAIGNS;
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("rugumaho_campaigns");
-      if (saved) {
-        try {
-          currentCampaigns = JSON.parse(saved);
-        } catch(e) {
-          currentCampaigns = INITIAL_CAMPAIGNS;
-        }
-      }
-    }
-
-    const updatedCampaigns = [newCampaign, ...currentCampaigns];
-    if (typeof window !== "undefined") {
-      localStorage.setItem("rugumaho_campaigns", JSON.stringify(updatedCampaigns));
-    }
-
-    triggerToast("Newsletter sent successfully!");
-    setTimeout(() => {
-      router.push("/admin/newsletter");
-    }, 1500);
+    }).then(() => {
+      triggerToast("Newsletter sent successfully!");
+      setTimeout(() => {
+        router.push("/admin/newsletter");
+      }, 1500);
+    }).catch((err) => {
+      console.error("Error saving campaign in Sanity:", err);
+      alert("Failed to send newsletter. See console.");
+    });
   };
 
   const currentMonthYear = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });

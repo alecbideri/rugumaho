@@ -25,6 +25,7 @@ import {
   Flower
 } from "lucide-react";
 import { getPosts, addPost, updatePost, Post } from "../../../../lib/mockData";
+import { uploadImageToImageKit } from "../../../../lib/imagekitActions";
 
 // Loading Fallback for Suspense
 function LoadingFallback() {
@@ -59,30 +60,41 @@ function NewPostEditor() {
   const [isEditing, setIsEditing] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showToast, setShowToast] = useState<string | null>(null);
-  const [initialContent, setInitialContent] = useState("Start writing your story here...");
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [isUploadingFeatured, setIsUploadingFeatured] = useState(false);
 
   const editorRef = useRef<HTMLDivElement>(null);
   const titleTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const featuredFileInputRef = useRef<HTMLInputElement>(null);
+  const inlineFileInputRef = useRef<HTMLInputElement>(null);
 
   // Load editing post if ID exists
   useEffect(() => {
     if (editId) {
-      const allPosts = getPosts();
-      const post = allPosts.find((p) => p.id === editId);
-      if (post) {
-        setIsEditing(true);
-        setTitle(post.title);
-        setCategory(post.category || "Travel");
-        setTags(post.tags || []);
-        setCoverImage(post.coverImage || "");
-        setExcerpt(post.excerpt || "");
-        setStatus(post.status);
-        setVisibility(post.status === "published" ? "Public" : "Private");
-        setInitialContent(post.content);
-        setContent(post.content);
-        if (editorRef.current) {
-          editorRef.current.innerHTML = post.content;
+      getPosts().then((allPosts) => {
+        const post = allPosts.find((p) => p.id === editId);
+        if (post) {
+          setIsEditing(true);
+          setTitle(post.title);
+          setCategory(post.category || "Travel");
+          setTags(post.tags || []);
+          setCoverImage(post.coverImage || "");
+          setExcerpt(post.excerpt || "");
+          setStatus(post.status);
+          setVisibility(post.status === "published" ? "Public" : "Private");
+          setIsFeatured(post.isFeatured || false);
+          setContent(post.content);
+          if (editorRef.current) {
+            editorRef.current.innerHTML = post.content;
+          }
         }
+      }).catch((err) => {
+        console.error("Failed to load post for editing:", err);
+      });
+    } else {
+      // If creating a new post, initialize helper placeholder
+      if (editorRef.current && !content) {
+        editorRef.current.innerHTML = "Start writing your story here...";
       }
     }
   }, [editId]);
@@ -129,17 +141,59 @@ function NewPostEditor() {
     }
   };
 
+  const getYouTubeEmbedUrl = (url: string): string | null => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    if (match && match[2].length === 11) {
+      return `https://www.youtube.com/embed/${match[2]}`;
+    }
+    return null;
+  };
+
   const handleImageButton = () => {
-    const url = prompt("Enter the image URL:");
-    if (url) {
-      formatText("insertImage", url);
+    const choice = confirm("Would you like to upload a local image from your computer?\n\n(Click 'OK' to select a file, or click 'Cancel' to input a web link/URL instead.)");
+    if (choice) {
+      inlineFileInputRef.current?.click();
+    } else {
+      const url = prompt("Enter the image web URL:");
+      if (url) {
+        formatText("insertImage", url);
+      }
     }
   };
 
+  const handleInlineFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    triggerToast("Uploading image to ImageKit...");
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64 = reader.result as string;
+        const res = await uploadImageToImageKit(base64, file.name);
+        if (res.success && res.url) {
+          formatText("insertImage", res.url);
+          triggerToast("Image inserted successfully!");
+        } else {
+          alert("ImageKit upload failed: " + (res.error || "Unknown error"));
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (err: any) {
+      console.error(err);
+      alert("Failed to read file: " + err.message);
+    }
+    e.target.value = "";
+  };
+
   const handleVideoButton = () => {
-    const embedCode = prompt("Enter video URL or YouTube embed code:");
+    const embedCode = prompt("Enter video YouTube URL or iframe embed code:");
     if (embedCode) {
-      if (embedCode.includes("<iframe")) {
+      const ytEmbed = getYouTubeEmbedUrl(embedCode);
+      if (ytEmbed) {
+        formatText("insertHTML", `<iframe src="${ytEmbed}" class="w-full aspect-video rounded-lg my-4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`);
+      } else if (embedCode.includes("<iframe")) {
         formatText("insertHTML", `<div class="aspect-video w-full my-4">${embedCode}</div>`);
       } else {
         formatText("insertHTML", `<video src="${embedCode}" controls class="w-full my-4 rounded-lg" />`);
@@ -163,17 +217,44 @@ function NewPostEditor() {
   };
 
   const handleEditFeaturedImage = () => {
-    const url = prompt("Enter new cover image URL:", coverImage);
-    if (url) {
-      setCoverImage(url);
+    const choice = confirm("Would you like to upload a local cover image from your computer?\n\n(Click 'OK' to select a file, or click 'Cancel' to input a web link/URL instead.)");
+    if (choice) {
+      featuredFileInputRef.current?.click();
+    } else {
+      const url = prompt("Enter cover image web URL:", coverImage);
+      if (url) {
+        setCoverImage(url);
+      }
     }
   };
 
-  const handleDropzoneClick = () => {
-    const url = prompt("Enter image URL to use as cover:");
-    if (url) {
-      setCoverImage(url);
+  const handleFeaturedFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingFeatured(true);
+    triggerToast("Uploading cover image...");
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64 = reader.result as string;
+        const res = await uploadImageToImageKit(base64, file.name);
+        setIsUploadingFeatured(false);
+        if (res.success && res.url) {
+          setCoverImage(res.url);
+          triggerToast("Cover image uploaded successfully!");
+        } else {
+          alert("ImageKit upload failed: " + (res.error || "Unknown error"));
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (err: any) {
+      console.error(err);
+      setIsUploadingFeatured(false);
+      alert("Failed to read file: " + err.message);
     }
+    // Reset file input value so same file can be uploaded again
+    e.target.value = "";
   };
 
   const handleSave = (statusToSave: "draft" | "published") => {
@@ -208,7 +289,8 @@ function NewPostEditor() {
       tags,
       author: "Ariane Rugumaho",
       status: statusToSave,
-      readTime: calculatedReadTime()
+      readTime: calculatedReadTime(),
+      isFeatured
     };
 
     if (isEditing && editId) {
@@ -216,16 +298,26 @@ function NewPostEditor() {
         ...postData,
         id: editId,
         createdAt: new Date().toISOString().split("T")[0]
+      }).then(() => {
+        triggerToast("Post updated successfully!");
+        setTimeout(() => {
+          router.push("/admin/dashboard");
+        }, 1500);
+      }).catch((err) => {
+        console.error("Error updating post:", err);
+        alert("Failed to update post. See console.");
       });
-      triggerToast("Post updated successfully!");
     } else {
-      addPost(postData);
-      triggerToast("Post created successfully!");
+      addPost(postData).then(() => {
+        triggerToast("Post created successfully!");
+        setTimeout(() => {
+          router.push("/admin/dashboard");
+        }, 1500);
+      }).catch((err) => {
+        console.error("Error creating post:", err);
+        alert("Failed to create post. See console.");
+      });
     }
-
-    setTimeout(() => {
-      router.push("/admin/dashboard");
-    }, 1500);
   };
 
   const triggerToast = (message: string) => {
@@ -426,6 +518,22 @@ function NewPostEditor() {
               </div>
             </div>
 
+            {/* Hidden File Inputs for ImageKit */}
+            <input 
+              type="file" 
+              ref={featuredFileInputRef} 
+              onChange={handleFeaturedFileChange} 
+              className="hidden" 
+              accept="image/*" 
+            />
+            <input 
+              type="file" 
+              ref={inlineFileInputRef} 
+              onChange={handleInlineFileChange} 
+              className="hidden" 
+              accept="image/*" 
+            />
+
             {/* Story Title Input */}
             <textarea 
               ref={titleTextareaRef}
@@ -436,7 +544,6 @@ function NewPostEditor() {
               onChange={(e) => setTitle(e.target.value)}
             />
 
-            {/* Rich Editor Field */}
             <div 
               ref={editorRef}
               className="wysiwyg-content min-h-[500px] text-lg font-serif leading-relaxed text-slate-700 dark:text-slate-300 focus:outline-none" 
@@ -444,24 +551,8 @@ function NewPostEditor() {
               onFocus={handleEditorFocus}
               onBlur={handleEditorBlur}
               onInput={handleEditorInput}
-              dangerouslySetInnerHTML={{ __html: initialContent }}
+              suppressContentEditableWarning={true}
             />
-
-            {/* Dropzone area at bottom */}
-            <div className="mt-12">
-              <div 
-                onClick={handleDropzoneClick}
-                className="border-2 border-dashed border-primary/20 hover:border-primary hover:bg-primary/[0.02] rounded-xl p-12 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all"
-              >
-                <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <ImagePlus className="w-6 h-6" />
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Drop an image here</p>
-                  <p className="text-xs text-slate-500">or click to upload from your computer</p>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
 
@@ -532,6 +623,11 @@ function NewPostEditor() {
                       <Edit3 className="w-5 h-5" />
                     </button>
                   </>
+                ) : isUploadingFeatured ? (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-primary">
+                    <span className="size-6 rounded-full border-2 border-t-primary border-slate-200 dark:border-slate-700 animate-spin"></span>
+                    <span className="text-[10px] font-semibold text-slate-500">Uploading...</span>
+                  </div>
                 ) : (
                   <button 
                     onClick={handleEditFeaturedImage}
@@ -604,6 +700,23 @@ function NewPostEditor() {
                   <option value="Public">Public</option>
                   <option value="Private">Private</option>
                 </select>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-slate-400" />
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Feature in Hero</span>
+                </div>
+                <button 
+                  type="button"
+                  onClick={() => setIsFeatured(!isFeatured)}
+                  className={`relative inline-flex h-5 w-10 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ring-0 ${
+                    isFeatured ? "bg-primary" : "bg-slate-200 dark:bg-slate-700"
+                  }`}
+                >
+                  <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    isFeatured ? "translate-x-5" : "translate-x-0"
+                  }`}></span>
+                </button>
               </div>
             </div>
           </div>

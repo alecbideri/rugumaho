@@ -79,22 +79,30 @@ export default function BlogPostPage({ params }: PageProps) {
   const [commentComposerFocused, setCommentComposerFocused] = useState(false);
 
   useEffect(() => {
-    const found = getPostBySlug(resolvedParams.slug);
-    if (found) {
-      setPost(found);
-    }
-    setMounted(true);
+    getPostBySlug(resolvedParams.slug).then((found) => {
+      if (found) {
+        setPost(found);
+      }
+      setMounted(true);
+    }).catch((err) => {
+      console.error("Error fetching post by slug:", err);
+      setMounted(true);
+    });
   }, [resolvedParams.slug]);
 
   useEffect(() => {
     if (post) {
-      const all = getPosts().filter(p => p.status === "published" && p.slug !== post.slug);
-      let recs = all.filter(p => p.category === post.category);
-      if (recs.length < 3) {
-        const others = all.filter(p => p.category !== post.category);
-        recs = [...recs, ...others];
-      }
-      setRecommended(recs.slice(0, 3));
+      getPosts().then((fetched) => {
+        const all = fetched.filter(p => p.status === "published" && p.slug !== post.slug);
+        let recs = all.filter(p => p.category === post.category);
+        if (recs.length < 3) {
+          const others = all.filter(p => p.category !== post.category);
+          recs = [...recs, ...others];
+        }
+        setRecommended(recs.slice(0, 3));
+      }).catch((err) => {
+        console.error("Error fetching recommended posts:", err);
+      });
     }
   }, [post]);
 
@@ -329,7 +337,14 @@ export default function BlogPostPage({ params }: PageProps) {
 
         {/* Article Body Content */}
         <article className="mx-auto mt-16 max-w-[680px] text-lg leading-[1.8] text-slate-700">
-          {renderContentBlocks(post.content)}
+          {post.content.trim().startsWith("<") || post.content.includes("</") ? (
+            <div 
+              className="wysiwyg-content text-slate-700 dark:text-slate-350"
+              dangerouslySetInnerHTML={{ __html: post.content }} 
+            />
+          ) : (
+            renderContentBlocks(post.content)
+          )}
 
           {/* Author Bio Card */}
           <section className="mt-20 flex flex-col items-center rounded-xl bg-[#F0FBFF]/70 backdrop-blur-md border border-primary/20 shadow-sm shadow-primary/5 p-8 text-center sm:flex-row sm:text-left">

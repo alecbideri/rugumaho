@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getPosts, deletePost, Post } from "../../../lib/mockData";
+import { getPosts, deletePost, Post, getBlogSettings, updateBlogSettings, BlogSettings } from "../../../lib/mockData";
 import { 
   Plus, 
   ArrowRight, 
@@ -23,11 +23,23 @@ export default function AdminDashboard() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [mounted, setMounted] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
+  const [settings, setSettings] = useState<BlogSettings>({ heroLayout: 'carousel' });
   const router = useRouter();
 
   useEffect(() => {
-    setPosts(getPosts());
-    setMounted(true);
+    getPosts().then((data) => {
+      setPosts(data);
+      setMounted(true);
+    }).catch((err) => {
+      console.error("Failed to load dashboard posts from Sanity:", err);
+      setMounted(true);
+    });
+    
+    getBlogSettings().then((data) => {
+      setSettings(data);
+    }).catch((err) => {
+      console.error("Failed to load global layout settings:", err);
+    });
     
     // Format date string dynamically on client
     const options: Intl.DateTimeFormatOptions = { 
@@ -39,10 +51,21 @@ export default function AdminDashboard() {
     setCurrentDate(new Date().toLocaleDateString("en-US", options));
   }, []);
 
+  const handleSettingsChange = (newSettings: Partial<BlogSettings>) => {
+    const updated = { ...settings, ...newSettings };
+    setSettings(updated);
+    updateBlogSettings(updated).catch(err => {
+      console.error("Failed to save global settings:", err);
+    });
+  };
+
   const handleDelete = (id: string, title: string) => {
     if (confirm(`Are you sure you want to delete "${title}"?`)) {
-      deletePost(id);
-      setPosts(getPosts());
+      deletePost(id).then(() => {
+        getPosts().then(data => setPosts(data));
+      }).catch(err => {
+        console.error("Error deleting post from Sanity:", err);
+      });
     }
   };
 
@@ -168,68 +191,76 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-sm font-medium text-slate-700">
-                    {mounted && posts.slice(0, 3).map((post) => (
-                      <tr key={post.id} className="hover:bg-slate-50 transition-colors">
-                        {/* Title and Date */}
-                        <td className="px-6 py-4">
-                          <p className="text-sm font-medium text-slate-900 truncate max-w-[200px]">{post.title}</p>
-                          <p className="text-xs text-slate-400 font-semibold mt-0.5">{post.createdAt}</p>
-                        </td>
-                        
-                        {/* Category badge */}
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${getCategoryBadgeClass(post.category)}`}>
-                            {post.category || "Lifestyle"}
-                          </span>
-                        </td>
-                        
-                        {/* Status badge */}
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                            post.status === "published"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-amber-100 text-amber-700"
-                          }`}>
-                            {post.status}
-                          </span>
-                        </td>
-                        
-                        {/* Mock Views */}
-                        <td className="px-6 py-4 text-slate-600">
-                          {post.status === "published" ? "1,240" : "0"}
-                        </td>
-                        
-                        {/* Actions */}
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex justify-end gap-2 text-slate-400">
-                            {post.status === "published" && (
-                              <Link 
-                                href={`/posts/${post.slug}`}
-                                target="_blank"
-                                className="hover:text-primary transition-colors p-1"
-                                title="View public post"
-                              >
-                                <Eye className="w-4.5 h-4.5" />
-                              </Link>
-                            )}
-                            <Link 
-                              href={`/admin/posts/new?id=${post.id}`}
-                              className="hover:text-primary transition-colors p-1 cursor-pointer"
-                              title="Edit post"
-                            >
-                              <FileEdit className="w-4.5 h-4.5" />
-                            </Link>
-                            <button 
-                              onClick={() => handleDelete(post.id, post.title)}
-                              className="hover:text-red-500 transition-colors p-1 cursor-pointer"
-                              title="Delete post"
-                            >
-                              <Trash2 className="w-4.5 h-4.5" />
-                            </button>
-                          </div>
+                    {mounted && posts.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-12 text-center text-slate-400 font-semibold">
+                          No posts created yet. Click &ldquo;New Post&rdquo; to write your first story!
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      mounted && posts.slice(0, 3).map((post) => (
+                        <tr key={post.id} className="hover:bg-slate-50 transition-colors">
+                          {/* Title and Date */}
+                          <td className="px-6 py-4">
+                            <p className="text-sm font-medium text-slate-900 truncate max-w-[200px]">{post.title}</p>
+                            <p className="text-xs text-slate-400 font-semibold mt-0.5">{post.createdAt}</p>
+                          </td>
+                          
+                          {/* Category badge */}
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${getCategoryBadgeClass(post.category)}`}>
+                              {post.category || "Lifestyle"}
+                            </span>
+                          </td>
+                          
+                          {/* Status badge */}
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                              post.status === "published"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-amber-100 text-amber-700"
+                            }`}>
+                              {post.status}
+                            </span>
+                          </td>
+                          
+                          {/* Mock Views */}
+                          <td className="px-6 py-4 text-slate-600">
+                            {post.status === "published" ? "1,240" : "0"}
+                          </td>
+                          
+                          {/* Actions */}
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex justify-end gap-2 text-slate-400">
+                              {post.status === "published" && (
+                                <Link 
+                                  href={`/posts/${post.slug}`}
+                                  target="_blank"
+                                  className="hover:text-primary transition-colors p-1"
+                                  title="View public post"
+                                >
+                                  <Eye className="w-4.5 h-4.5" />
+                                </Link>
+                              )}
+                              <Link 
+                                href={`/admin/posts/new?id=${post.id}`}
+                                className="hover:text-primary transition-colors p-1 cursor-pointer"
+                                title="Edit post"
+                              >
+                                <FileEdit className="w-4.5 h-4.5" />
+                              </Link>
+                              <button 
+                                onClick={() => handleDelete(post.id, post.title)}
+                                className="hover:text-red-500 transition-colors p-1 cursor-pointer"
+                                title="Delete post"
+                              >
+                                <Trash2 className="w-4.5 h-4.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -271,6 +302,68 @@ export default function AdminDashboard() {
           {/* Right Column (Newsletter Overview & Insights) */}
           <div className="space-y-8">
             
+            {/* Hero Layout Settings Card */}
+            {mounted && (
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-6 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between">
+                  <h4 className="font-serif text-xl font-bold text-slate-800">Hero Layout Settings</h4>
+                  <Zap className="w-5 h-5 text-primary" />
+                </div>
+                <div className="p-6 space-y-6">
+                  {/* Select Layout Type */}
+                  <div className="space-y-3">
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Display Format</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => handleSettingsChange({ heroLayout: 'single' })}
+                        className={`py-2 px-3 rounded-lg border text-sm font-semibold transition-all cursor-pointer ${
+                          settings.heroLayout === 'single'
+                            ? "bg-slate-900 border-slate-900 text-white shadow-sm"
+                            : "border-slate-200 text-slate-500 hover:border-slate-300 bg-white"
+                        }`}
+                      >
+                        Single Post
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSettingsChange({ heroLayout: 'carousel' })}
+                        className={`py-2 px-3 rounded-lg border text-sm font-semibold transition-all cursor-pointer ${
+                          settings.heroLayout === 'carousel'
+                            ? "bg-slate-900 border-slate-900 text-white shadow-sm"
+                            : "border-slate-200 text-slate-500 hover:border-slate-300 bg-white"
+                        }`}
+                      >
+                        Carousel Slider
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Pick Single Story Dropdown Selector */}
+                  {settings.heroLayout === 'single' && (
+                    <div className="space-y-3 pt-4 border-t border-slate-100">
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Select Hero Post</label>
+                      <select
+                        value={settings.selectedHeroPostId || ""}
+                        onChange={(e) => handleSettingsChange({ selectedHeroPostId: e.target.value })}
+                        className="w-full bg-slate-50 border-slate-200 rounded-lg text-sm focus:border-primary focus:ring-primary py-2 px-3"
+                      >
+                        <option value="" disabled>-- Choose a story --</option>
+                        {posts.filter(p => p.status === 'published').map((post) => (
+                          <option key={post.id} value={post.id}>
+                            {post.title} ({post.category || "Lifestyle"})
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-[11px] text-slate-400 italic">
+                        Select a published post to display as the single landing page hero.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Newsletter Overview Card */}
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="p-6 bg-slate-50/50 border-b border-slate-100">

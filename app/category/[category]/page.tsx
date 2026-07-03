@@ -128,33 +128,37 @@ export default function CategoryPage({ params }: PageProps) {
 
   // Load category posts on mount
   useEffect(() => {
-    const all = getPosts().filter(p => p.status === "published");
-    
-    // Filter by category
-    let categoryFiltered = rawCategory.toLowerCase() === "all"
-      ? all
-      : all.filter(p => p.category?.toLowerCase() === rawCategory.toLowerCase());
+    getPosts().then((fetched) => {
+      const all = fetched.filter(p => p.status === "published");
       
-    // Filter by search query if present in URL
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const search = params.get("search");
-      if (search) {
-        const query = search.toLowerCase();
-        categoryFiltered = categoryFiltered.filter(
-          p => p.title.toLowerCase().includes(query) || 
-               p.excerpt.toLowerCase().includes(query) ||
-               p.content.toLowerCase().includes(query)
-        );
+      // Filter by category
+      let categoryFiltered = rawCategory.toLowerCase() === "all"
+        ? all
+        : all.filter(p => p.category?.toLowerCase() === rawCategory.toLowerCase());
+        
+      // Filter by search query if present in URL
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const search = params.get("search");
+        if (search) {
+          const query = search.toLowerCase();
+          categoryFiltered = categoryFiltered.filter(
+            p => p.title.toLowerCase().includes(query) || 
+                 p.excerpt.toLowerCase().includes(query) ||
+                 p.content.toLowerCase().includes(query)
+          );
+        }
       }
-    }
-    
-    setAllCategoryPosts(categoryFiltered);
-    setPosts(categoryFiltered);
-    
-    // Extract unique categories for header dropdown
-    const cats = Array.from(new Set(all.map(p => p.category).filter(Boolean))) as string[];
-    setGlobalCategories(cats);
+      
+      setAllCategoryPosts(categoryFiltered);
+      setPosts(categoryFiltered);
+      
+      // Extract unique categories for header dropdown
+      const cats = Array.from(new Set(all.map(p => p.category).filter(Boolean))) as string[];
+      setGlobalCategories(cats);
+    }).catch(err => {
+      console.error("Error loading category posts from Sanity:", err);
+    });
   }, [rawCategory]);
 
   // Handle filtering and sorting
