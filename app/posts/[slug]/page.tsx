@@ -91,10 +91,38 @@ export default function BlogPostPage({ params }: PageProps) {
 
   const [toast, setToast] = useState<string | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isInstagramModalOpen, setIsInstagramModalOpen] = useState(false);
 
   const triggerToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleInstagramShare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!post) return;
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      navigator.share({
+        title: post.title,
+        text: post.excerpt,
+        url: window.location.href
+      })
+      .then(() => setIsShareModalOpen(false))
+      .catch((err) => {
+        console.error("Native share failed, fallback to copy:", err);
+        fallbackInstagramShare();
+      });
+    } else {
+      fallbackInstagramShare();
+    }
+  };
+
+  const fallbackInstagramShare = () => {
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(window.location.href);
+      setIsShareModalOpen(false);
+      setIsInstagramModalOpen(true);
+    }
   };
 
   const isAuthor = (name: string, email?: string) => {
@@ -819,14 +847,11 @@ export default function BlogPostPage({ params }: PageProps) {
               </a>
 
               {/* Instagram */}
-              <a
-                href="https://instagram.com/arianerugumaho"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setIsShareModalOpen(false)}
-                className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 rounded-xl transition-all font-semibold text-xs text-slate-700 dark:text-slate-350 cursor-pointer"
+              <button
+                onClick={handleInstagramShare}
+                className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 rounded-xl transition-all font-semibold text-xs text-slate-700 dark:text-slate-350 cursor-pointer w-full text-left"
               >
-                <div className="size-8 rounded bg-[#E1306C] text-white flex items-center justify-center">
+                <div className="size-8 rounded bg-[#E1306C] text-white flex items-center justify-center shrink-0">
                   <svg className="w-4 h-4 stroke-white fill-none" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
@@ -834,7 +859,7 @@ export default function BlogPostPage({ params }: PageProps) {
                   </svg>
                 </div>
                 <span>Instagram</span>
-              </a>
+              </button>
 
               {/* WhatsApp */}
               <a
@@ -874,6 +899,46 @@ export default function BlogPostPage({ params }: PageProps) {
                   Copy
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Instagram Fallback Modal */}
+      {isInstagramModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in text-left">
+          <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-105 dark:border-slate-800 p-6 space-y-4 animate-scale-in">
+            <div className="space-y-2">
+              <h3 className="text-base font-serif font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <span className="size-6 rounded bg-[#E1306C] text-white flex items-center justify-center">
+                  <svg className="w-3.5 h-3.5 stroke-white fill-none" viewBox="0 0 24 24" strokeWidth="2.5">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                  </svg>
+                </span>
+                Link Copied for Instagram!
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-semibold">
+                The story link has been copied to your clipboard. Since Instagram does not support posting links directly from desktop browsers, you can now paste this link into your **Instagram Bio, Story, or Direct Message**.
+              </p>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setIsInstagramModalOpen(false)}
+                className="w-1/2 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 rounded-lg py-2 text-xs font-bold transition-all cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-850"
+              >
+                Close
+              </button>
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsInstagramModalOpen(false)}
+                className="w-1/2 bg-[#E1306C] text-white rounded-lg py-2 text-xs font-bold transition-all flex items-center justify-center cursor-pointer hover:opacity-90 text-center"
+              >
+                Open Instagram
+              </a>
             </div>
           </div>
         </div>
