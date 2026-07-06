@@ -225,8 +225,18 @@ export default function AdminDashboard() {
           <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
             <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Comments Pending</p>
             <div className="mt-2 flex items-end justify-between">
-              <h3 className="text-3xl font-bold text-slate-900">12</h3>
-              <span className="bg-primary text-white text-xs font-bold px-2.5 py-1 rounded-full tracking-wider uppercase">ACTION NEEDED</span>
+              <h3 className="text-3xl font-bold text-slate-900">
+                {mounted ? pendingComments.length : "-"}
+              </h3>
+              {pendingComments.length > 0 ? (
+                <span className="bg-amber-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wider uppercase">
+                  Action Needed
+                </span>
+              ) : (
+                <span className="bg-slate-100 text-slate-400 text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wider uppercase">
+                  All Clear
+                </span>
+              )}
             </div>
           </div>
         </div>
