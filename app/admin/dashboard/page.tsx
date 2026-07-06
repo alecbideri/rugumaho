@@ -359,11 +359,12 @@ export default function AdminDashboard() {
               
               {/* View Site */}
               <Link 
-                href="#"
-                className="flex items-center justify-between p-8 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-slate-400 hover:shadow-md transition-all group cursor-pointer"
+                href="/"
+                target="_blank"
+                className="flex items-center justify-between p-8 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-slate-400 hover:shadow-md transition-all group cursor-pointer w-full"
               >
                 <div>
-                  <h4 className="font-serif text-2xl font-bold text-slate-800">View Site</h4>
+                  <h4 className="font-serif text-2xl font-bold text-slate-800 group-hover:text-primary transition-colors">View Site</h4>
                   <p className="text-slate-500 text-sm mt-1">Check the public version</p>
                 </div>
                 <div className="size-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all shrink-0">
