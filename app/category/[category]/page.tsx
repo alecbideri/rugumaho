@@ -9,7 +9,8 @@ import {
   ChevronRight,
   TrendingUp,
   Mail,
-  ChevronDown
+  ChevronDown,
+  Search
 } from "lucide-react";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
@@ -117,6 +118,8 @@ export default function CategoryPage({ params }: PageProps) {
   const [sortBy, setSortBy] = useState<"latest" | "oldest">("latest");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeSearch, setActiveSearch] = useState("");
+  const [localSearchInput, setLocalSearchInput] = useState("");
   const [globalCategories, setGlobalCategories] = useState<string[]>([]);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   
@@ -137,10 +140,12 @@ export default function CategoryPage({ params }: PageProps) {
         : all.filter(p => p.category?.toLowerCase() === rawCategory.toLowerCase());
         
       // Filter by search query if present in URL
+      let searchVal = "";
       if (typeof window !== "undefined") {
         const params = new URLSearchParams(window.location.search);
         const search = params.get("search");
         if (search) {
+          searchVal = search;
           const query = search.toLowerCase();
           categoryFiltered = categoryFiltered.filter(
             p => p.title.toLowerCase().includes(query) || 
@@ -150,6 +155,8 @@ export default function CategoryPage({ params }: PageProps) {
         }
       }
       
+      setActiveSearch(searchVal);
+      setLocalSearchInput(searchVal);
       setAllCategoryPosts(categoryFiltered);
       setPosts(categoryFiltered);
       
@@ -160,6 +167,55 @@ export default function CategoryPage({ params }: PageProps) {
       console.error("Error loading category posts from Sanity:", err);
     });
   }, [rawCategory]);
+
+  const handleClearSearch = () => {
+    setActiveSearch("");
+    setLocalSearchInput("");
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("search");
+      window.history.pushState({}, "", url.toString());
+    }
+    // Reload posts without search query
+    getPosts().then((fetched) => {
+      const all = fetched.filter(p => p.status === "published");
+      let categoryFiltered = rawCategory.toLowerCase() === "all"
+        ? all
+        : all.filter(p => p.category?.toLowerCase() === rawCategory.toLowerCase());
+      setAllCategoryPosts(categoryFiltered);
+      setPosts(categoryFiltered);
+    });
+  };
+
+  const handleLocalSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (localSearchInput.trim()) {
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.set("search", localSearchInput.trim());
+        window.history.pushState({}, "", url.toString());
+      }
+      
+      // Reload posts with new search query
+      getPosts().then((fetched) => {
+        const all = fetched.filter(p => p.status === "published");
+        let categoryFiltered = rawCategory.toLowerCase() === "all"
+          ? all
+          : all.filter(p => p.category?.toLowerCase() === rawCategory.toLowerCase());
+        
+        const query = localSearchInput.trim().toLowerCase();
+        categoryFiltered = categoryFiltered.filter(
+          p => p.title.toLowerCase().includes(query) || 
+               p.excerpt.toLowerCase().includes(query) ||
+               p.content.toLowerCase().includes(query)
+        );
+        
+        setActiveSearch(localSearchInput.trim());
+        setAllCategoryPosts(categoryFiltered);
+        setPosts(categoryFiltered);
+      });
+    }
+  };
 
   // Handle filtering and sorting
   useEffect(() => {
@@ -276,6 +332,42 @@ export default function CategoryPage({ params }: PageProps) {
         </div>
       </div>
 
+      {/* Search Header Banner */}
+      {activeSearch && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 text-left">
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Search Results</span>
+              <h2 className="text-2xl font-serif font-bold text-slate-900">
+                Showing results for &ldquo;{activeSearch}&rdquo;
+              </h2>
+              <p className="text-xs text-slate-500 font-semibold">
+                Found {posts.length} matching {posts.length === 1 ? 'story' : 'stories'} in {categoryName}
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+              <form onSubmit={handleLocalSearchSubmit} className="relative flex-grow">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Refine search..."
+                  value={localSearchInput}
+                  onChange={(e) => setLocalSearchInput(e.target.value)}
+                  className="w-full md:w-[220px] bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none font-semibold text-slate-700"
+                />
+              </form>
+              <button
+                onClick={handleClearSearch}
+                className="px-5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-primary hover:text-slate-900 transition-all cursor-pointer whitespace-nowrap"
+              >
+                Clear Search
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         <div className="flex flex-col lg:flex-row gap-12">
@@ -283,8 +375,27 @@ export default function CategoryPage({ params }: PageProps) {
           {/* Posts Grid Container */}
           <div className="flex-1">
             {currentPosts.length === 0 ? (
-              <div className="text-center py-20 bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400">
-                No stories found in this category under &ldquo;{activeTag}&rdquo;.
+              <div className="text-center py-20 bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400 space-y-4">
+                <div className="mx-auto size-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                  <Search className="w-6 h-6" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-bold text-slate-800">No stories found</p>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+                    We couldn't find any stories matching &ldquo;{activeSearch || activeTag}&rdquo; in this category. Try refining your keywords or clearing filters.
+                  </p>
+                </div>
+                {(activeSearch || activeTag !== "All") && (
+                  <button
+                    onClick={() => {
+                      setActiveTag("All");
+                      handleClearSearch();
+                    }}
+                    className="px-4 py-2 rounded-lg text-xs font-bold bg-slate-900 hover:bg-primary text-white hover:text-slate-900 transition-all cursor-pointer shadow-sm"
+                  >
+                    Reset all filters
+                  </button>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
