@@ -311,6 +311,7 @@ export async function getCommentsForPostServer(postSlug: string) {
         avatar,
         likes,
         status,
+        parentId,
         createdAt
       }`,
       { postSlug }
@@ -328,6 +329,7 @@ export async function addCommentServer(commentData: {
   email: string;
   content: string;
   avatar: string;
+  parentId?: string;
 }) {
   try {
     const doc = {
@@ -339,6 +341,7 @@ export async function addCommentServer(commentData: {
       avatar: commentData.avatar,
       likes: 0,
       status: 'pending',
+      parentId: commentData.parentId,
       createdAt: new Date().toISOString()
     };
 

@@ -49,6 +49,7 @@ export interface BlogComment {
   avatar: string;
   likes: number;
   status: 'pending' | 'approved';
+  parentId?: string;
   createdAt: string;
 }
 

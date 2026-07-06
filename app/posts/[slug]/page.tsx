@@ -30,6 +30,7 @@ interface Comment {
   content: string;
   time: string;
   likes: number;
+  email?: string;
   replies?: Comment[];
 }
 
@@ -82,6 +83,18 @@ export default function BlogPostPage({ params }: PageProps) {
   const [recommended, setRecommended] = useState<Post[]>([]);
   const [commentComposerFocused, setCommentComposerFocused] = useState(false);
 
+  // Replies states
+  const [replyToCommentId, setReplyToCommentId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [replyName, setReplyName] = useState("");
+  const [replyEmail, setReplyEmail] = useState("");
+
+  const isAuthor = (name: string, email?: string) => {
+    const lowercaseEmail = email?.toLowerCase().trim();
+    return (name === "Ariane Rugumaho" || (post && name === post.author)) && 
+           (lowercaseEmail === "hello@rugumaho.com" || lowercaseEmail === "alecbideri@gmail.com");
+  };
+
   useEffect(() => {
     getPostBySlug(resolvedParams.slug).then((found) => {
       if (found) {
@@ -94,14 +107,33 @@ export default function BlogPostPage({ params }: PageProps) {
     });
 
     getApprovedComments(resolvedParams.slug).then((data) => {
-      const mapped = data.map((c) => ({
-        id: c.id,
-        author: c.name,
-        avatar: c.avatar,
-        content: c.content,
-        time: new Date(c.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-        likes: c.likes || 0
-      }));
+      const rootComments = data.filter(c => !c.parentId);
+      const replies = data.filter(c => c.parentId);
+
+      const mapped = rootComments.map((c) => {
+        const commentReplies = replies
+          .filter(r => r.parentId === c.id)
+          .map(r => ({
+            id: r.id,
+            author: r.name,
+            avatar: r.avatar,
+            content: r.content,
+            time: new Date(r.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+            likes: r.likes || 0,
+            email: r.email
+          }));
+
+        return {
+          id: c.id,
+          author: c.name,
+          avatar: c.avatar,
+          content: c.content,
+          time: new Date(c.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+          likes: c.likes || 0,
+          email: c.email,
+          replies: commentReplies
+        };
+      });
       setComments(mapped);
     }).catch(err => {
       console.error("Failed to load approved comments:", err);
@@ -186,6 +218,34 @@ export default function BlogPostPage({ params }: PageProps) {
     }).catch((err) => {
       console.error("Failed to submit comment:", err);
       alert("Failed to submit comment. Please try again.");
+    });
+  };
+
+  const handlePostReply = (e: React.FormEvent, parentId: string) => {
+    e.preventDefault();
+    if (!replyText.trim() || !replyName.trim() || !replyEmail.trim()) return;
+
+    const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(replyName.trim())}`;
+
+    const newReplyData = {
+      postSlug: resolvedParams.slug,
+      name: replyName.trim(),
+      email: replyEmail.trim(),
+      content: replyText.trim(),
+      avatar: avatarUrl,
+      parentId: parentId
+    };
+
+    addComment(newReplyData).then(() => {
+      setIsSubmitted(true);
+      setReplyText("");
+      setReplyName("");
+      setReplyEmail("");
+      setReplyToCommentId(null);
+      setTimeout(() => setIsSubmitted(false), 7000);
+    }).catch((err) => {
+      console.error("Failed to submit reply:", err);
+      alert("Failed to submit reply. Please try again.");
     });
   };
 
@@ -525,88 +585,179 @@ export default function BlogPostPage({ params }: PageProps) {
 
           {/* Comments List */}
           <div className="space-y-8">
-            {comments.map((comment) => (
-              <div key={comment.id} className="group">
-                <div className="flex gap-4">
-                  <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border border-slate-100 bg-slate-50">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img 
-                      className="h-full w-full object-cover" 
-                      alt={comment.author} 
-                      src={comment.avatar}
-                    />
-                  </div>
-                  <div className="flex-grow">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900 text-sm">{comment.author}</span>
-                      <span className="text-[10px] text-slate-400 font-semibold">{comment.time}</span>
+            {comments.map((comment) => {
+              const isRootAuthor = isAuthor(comment.author, comment.email);
+              return (
+                <div key={comment.id} className="group">
+                  <div className={`flex gap-4 p-4 rounded-xl transition-all ${
+                    isRootAuthor 
+                      ? "bg-sky-50/40 border border-sky-100 dark:bg-sky-950/10 dark:border-sky-900/20" 
+                      : ""
+                  }`}>
+                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border border-slate-100 bg-slate-50">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        className="h-full w-full object-cover" 
+                        alt={comment.author} 
+                        src={comment.avatar}
+                      />
                     </div>
-                    <p className="mt-2 text-slate-700 text-sm leading-relaxed">{comment.content}</p>
-                    <div className="mt-4 flex items-center gap-6 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                      <button 
-                        onClick={() => handleLikeComment(comment.id)}
-                        className="flex items-center gap-1.5 hover:text-primary transition-colors cursor-pointer"
-                      >
-                        <ThumbsUp className="w-3.5 h-3.5" /> {comment.likes}
-                      </button>
-                      <button className="hover:text-primary transition-colors cursor-pointer">Reply</button>
-                    </div>
+                    <div className="flex-grow">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-slate-905 text-sm">{comment.author}</span>
+                        {isRootAuthor && (
+                          <span className="rounded bg-primary/20 px-1.5 py-0.5 text-[8px] font-extrabold uppercase text-primary tracking-wider">
+                            Author
+                          </span>
+                        )}
+                        <span className="text-[10px] text-slate-400 font-semibold">{comment.time}</span>
+                      </div>
+                      <p className="mt-2 text-slate-700 text-sm leading-relaxed">{comment.content}</p>
+                      <div className="mt-4 flex items-center gap-6 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <button 
+                          onClick={() => handleLikeComment(comment.id)}
+                          className="flex items-center gap-1.5 hover:text-primary transition-colors cursor-pointer"
+                        >
+                          <ThumbsUp className="w-3.5 h-3.5" /> {comment.likes}
+                        </button>
+                        <button 
+                          onClick={() => {
+                            setReplyToCommentId(comment.id);
+                            setReplyText("");
+                            setReplyName("");
+                            setReplyEmail("");
+                          }}
+                          className="hover:text-primary transition-colors cursor-pointer"
+                        >
+                          Reply
+                        </button>
+                      </div>
 
-                    {/* Nested Replies */}
-                    {comment.replies && comment.replies.length > 0 && (
-                      <div className="mt-6 relative pl-4 sm:pl-8">
-                        {/* Thread line */}
-                        <div className="absolute left-0 top-0 h-full w-px bg-slate-100"></div>
-                        
-                        {comment.replies.map((reply) => {
-                          const isAuthor = reply.author === authorInfo.name;
-                          return (
-                            <div 
-                              key={reply.id} 
-                              className={`rounded-xl p-4 mb-4 ${
-                                isAuthor ? "bg-[#F0FBFF]" : "bg-slate-50"
-                              }`}
+                      {/* Inline Reply Composer */}
+                      {replyToCommentId === comment.id && (
+                        <form 
+                          onSubmit={(e) => handlePostReply(e, comment.id)}
+                          className="mt-4 p-4 rounded-xl border border-slate-200 bg-slate-50/50 dark:bg-slate-800/30 dark:border-slate-800 space-y-3"
+                        >
+                          <p className="text-xs font-bold text-slate-450 dark:text-slate-400">Replying to {comment.author}</p>
+                          <textarea
+                            required
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            placeholder="Write your reply..."
+                            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary/20 focus:border-primary outline-none resize-none text-slate-700 dark:text-slate-300"
+                            rows={2}
+                          />
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <input
+                              type="text"
+                              required
+                              value={replyName}
+                              onChange={(e) => setReplyName(e.target.value)}
+                              placeholder="Your Name (required)"
+                              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-primary/20 focus:border-primary outline-none text-slate-700 dark:text-slate-350 font-semibold"
+                            />
+                            <input
+                              type="email"
+                              required
+                              value={replyEmail}
+                              onChange={(e) => setReplyEmail(e.target.value)}
+                              placeholder="Your Email (required, hidden)"
+                              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-primary/20 focus:border-primary outline-none text-slate-700 dark:text-slate-350 font-semibold"
+                            />
+                          </div>
+                          <div className="flex justify-end gap-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReplyToCommentId(null);
+                                setReplyText("");
+                                setReplyName("");
+                                setReplyEmail("");
+                              }}
+                              className="text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
                             >
-                              <div className="flex gap-4">
-                                <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full border border-slate-100">
-                                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                                  <img 
-                                    className="h-full w-full object-cover" 
-                                    alt={reply.author} 
-                                    src={reply.avatar}
-                                  />
-                                </div>
-                                <div className="flex-grow">
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="font-bold text-slate-900 text-xs">{reply.author}</span>
-                                    {isAuthor && (
-                                      <span className="rounded bg-primary/20 px-1.5 py-0.5 text-[8px] font-extrabold uppercase text-primary tracking-wider">
-                                        Author
-                                      </span>
-                                    )}
-                                    <span className="text-[10px] text-slate-400 font-semibold">{reply.time}</span>
+                              Cancel
+                            </button>
+                            <button
+                              type="submit"
+                              disabled={!replyText.trim() || !replyName.trim() || !replyEmail.trim()}
+                              className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary dark:hover:bg-primary hover:text-slate-900 rounded-lg px-4 py-2 text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
+                            >
+                              Post Reply
+                            </button>
+                          </div>
+                        </form>
+                      )}
+
+                      {/* Nested Replies */}
+                      {comment.replies && comment.replies.length > 0 && (
+                        <div className="mt-6 relative pl-4 sm:pl-8">
+                          {/* Thread line */}
+                          <div className="absolute left-0 top-0 h-full w-px bg-slate-100 dark:bg-slate-800"></div>
+                          
+                          {comment.replies.map((reply) => {
+                            const isReplyAuthor = isAuthor(reply.author, reply.email);
+                            return (
+                              <div 
+                                key={reply.id} 
+                                className={`rounded-xl p-4 mb-4 border transition-all ${
+                                  isReplyAuthor 
+                                    ? "bg-sky-50/70 border-sky-100 dark:bg-sky-950/20 dark:border-sky-900/30" 
+                                    : "bg-slate-50 border-slate-100 dark:bg-slate-800/40 dark:border-slate-800"
+                                }`}
+                              >
+                                <div className="flex gap-4">
+                                  <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full border border-slate-100">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img 
+                                      className="h-full w-full object-cover" 
+                                      alt={reply.author} 
+                                      src={reply.avatar}
+                                    />
                                   </div>
-                                  <p className="mt-2 text-slate-700 text-xs leading-relaxed">{reply.content}</p>
-                                  <div className="mt-3 flex items-center gap-4 text-[9px] font-bold uppercase tracking-wider text-slate-400">
-                                    <button 
-                                      onClick={() => handleLikeComment(reply.id)}
-                                      className="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer"
-                                    >
-                                      <ThumbsUp className="w-3 h-3" /> {reply.likes}
-                                    </button>
-                                    <button className="hover:text-primary transition-colors cursor-pointer">Reply</button>
+                                  <div className="flex-grow">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className="font-bold text-slate-900 dark:text-slate-100 text-xs">{reply.author}</span>
+                                      {isReplyAuthor && (
+                                        <span className="rounded bg-primary/20 px-1.5 py-0.5 text-[8px] font-extrabold uppercase text-primary tracking-wider">
+                                          Author
+                                        </span>
+                                      )}
+                                      <span className="text-[10px] text-slate-400 font-semibold">{reply.time}</span>
+                                    </div>
+                                    <p className="mt-2 text-slate-700 dark:text-slate-355 text-xs leading-relaxed">{reply.content}</p>
+                                    <div className="mt-3 flex items-center gap-4 text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                                      <button 
+                                        onClick={() => handleLikeComment(reply.id)}
+                                        className="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer"
+                                      >
+                                        <ThumbsUp className="w-3 h-3" /> {reply.likes}
+                                      </button>
+                                      <button 
+                                        onClick={() => {
+                                          setReplyToCommentId(comment.id);
+                                          setReplyName("");
+                                          setReplyEmail("");
+                                          setReplyText("");
+                                        }}
+                                        className="hover:text-primary transition-colors cursor-pointer"
+                                      >
+                                        Reply
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           
           <button className="group mt-10 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 py-4 text-sm font-bold text-slate-500 hover:border-primary hover:text-primary transition-all cursor-pointer">
