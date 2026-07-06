@@ -790,7 +790,7 @@ export default function BlogPostPage({ params }: PageProps) {
             <div className="grid grid-cols-2 gap-3">
               {/* X / Twitter */}
               <a
-                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&text=${encodeURIComponent(post.title)}`}
+                href={`https://x.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&text=${encodeURIComponent(post.title)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setIsShareModalOpen(false)}
