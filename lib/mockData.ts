@@ -16,7 +16,8 @@ import {
   addCommentServer,
   getPendingCommentsServer,
   approveCommentServer,
-  deleteCommentServer
+  deleteCommentServer,
+  incrementPostViewsServer
 } from './sanityActions';
 
 export interface Post {
@@ -33,6 +34,7 @@ export interface Post {
   createdAt: string;
   readTime: string;
   isFeatured?: boolean;
+  views?: number;
 }
 
 export interface BlogSettings {
@@ -191,4 +193,8 @@ export async function approveComment(id: string): Promise<void> {
 
 export async function deleteComment(id: string): Promise<void> {
   await deleteCommentServer(id);
+}
+
+export async function incrementPostViews(slug: string): Promise<void> {
+  await incrementPostViewsServer(slug);
 }

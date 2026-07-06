@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
-import { getPostBySlug, getPosts, Post, getApprovedComments, addComment } from "../../../lib/mockData";
+import { getPostBySlug, getPosts, Post, getApprovedComments, addComment, incrementPostViews } from "../../../lib/mockData";
 import { 
   Calendar, 
   User, 
@@ -132,6 +132,11 @@ export default function BlogPostPage({ params }: PageProps) {
   };
 
   useEffect(() => {
+    // Increment post views per load securely in Sanity
+    incrementPostViews(resolvedParams.slug).catch((err) => {
+      console.error("Failed to increment views:", err);
+    });
+
     getPostBySlug(resolvedParams.slug).then((found) => {
       if (found) {
         setPost(found);

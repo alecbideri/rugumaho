@@ -21,7 +21,8 @@ export async function getPostsServer() {
         status,
         createdAt,
         readTime,
-        isFeatured
+        isFeatured,
+        views
       }`
     );
     return posts || [];
@@ -47,7 +48,8 @@ export async function getPostBySlugServer(slug: string) {
         status,
         createdAt,
         readTime,
-        isFeatured
+        isFeatured,
+        views
       }`,
       { slug }
     );
@@ -398,6 +400,25 @@ export async function deleteCommentServer(id: string) {
   } catch (error: any) {
     console.error("Error deleting comment in Sanity:", error);
     throw new Error(error.message || "Failed to delete comment.");
+  }
+}
+
+export async function incrementPostViewsServer(slug: string) {
+  try {
+    const post = await sanityWriteClient.fetch(
+      `*[_type == "post" && (slug.current == $slug || slug == $slug)][0] { _id }`,
+      { slug }
+    );
+    if (post && post._id) {
+      await sanityWriteClient
+        .patch(post._id)
+        .setIfMissing({ views: 0 })
+        .inc({ views: 1 })
+        .commit();
+      console.log(`Incremented views for post: ${slug}`);
+    }
+  } catch (error) {
+    console.error("Error incrementing views on server:", error);
   }
 }
 

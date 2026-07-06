@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getPosts, deletePost, Post, getBlogSettings, updateBlogSettings, BlogSettings, BlogComment, getPendingComments, approveComment, deleteComment } from "../../../lib/mockData";
+import { getPosts, deletePost, Post, getBlogSettings, updateBlogSettings, BlogSettings, BlogComment, getPendingComments, approveComment, deleteComment, getSubscribers } from "../../../lib/mockData";
 import { 
   Plus, 
   ArrowRight, 
@@ -25,6 +25,7 @@ export default function AdminDashboard() {
   const [currentDate, setCurrentDate] = useState("");
   const [settings, setSettings] = useState<BlogSettings>({ heroLayout: 'carousel' });
   const [pendingComments, setPendingComments] = useState<BlogComment[]>([]);
+  const [subscribersCount, setSubscribersCount] = useState(0);
   const [modal, setModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -46,6 +47,12 @@ export default function AdminDashboard() {
     }).catch((err) => {
       console.error("Failed to load dashboard posts from Sanity:", err);
       setMounted(true);
+    });
+
+    getSubscribers().then((data) => {
+      setSubscribersCount(data.length);
+    }).catch((err) => {
+      console.error("Failed to load subscribers from Sanity:", err);
     });
     
     getBlogSettings().then((data) => {
@@ -188,14 +195,15 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* This Week's Views */}
+          {/* Total Views */}
           <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-            <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">This Week's Views</p>
+            <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Total Views</p>
             <div className="mt-2 flex items-end justify-between">
-              <h3 className="text-3xl font-bold text-slate-900">12,450</h3>
-              <span className="text-emerald-500 text-sm font-bold flex items-center bg-emerald-50 px-2 py-1 rounded">
-                <ArrowUp className="w-4 h-4 mr-0.5" />
-                15.2%
+              <h3 className="text-3xl font-bold text-slate-900">
+                {mounted ? posts.reduce((sum, p) => sum + (p.views || 0), 0).toLocaleString() : "-"}
+              </h3>
+              <span className="text-emerald-500 text-xs font-semibold bg-emerald-50 px-2.5 py-1 rounded">
+                Live Count
               </span>
             </div>
           </div>
@@ -204,10 +212,11 @@ export default function AdminDashboard() {
           <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
             <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Newsletter Subscribers</p>
             <div className="mt-2 flex items-end justify-between">
-              <h3 className="text-3xl font-bold text-slate-900">3,240</h3>
-              <span className="text-primary text-sm font-bold flex items-center bg-primary/5 px-2 py-1 rounded">
-                <TrendingUp className="w-4 h-4 mr-0.5" />
-                5.7%
+              <h3 className="text-3xl font-bold text-slate-900">
+                {mounted ? subscribersCount : "-"}
+              </h3>
+              <span className="text-slate-450 text-xs font-semibold bg-slate-50 px-2.5 py-1 rounded">
+                Pending Setup
               </span>
             </div>
           </div>
@@ -482,19 +491,19 @@ export default function AdminDashboard() {
               <div className="p-6 space-y-6">
                 <div className="flex justify-between items-center text-sm font-semibold">
                   <span className="text-slate-500">Subscribers</span>
-                  <span className="text-slate-900 font-bold">3,240</span>
+                  <span className="text-slate-900 font-bold">{mounted ? subscribersCount : "-"}</span>
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                  <div className="bg-primary h-full w-[65%]" />
+                  <div className="bg-primary h-full w-[0%]" />
                 </div>
                 <div className="grid grid-cols-2 gap-4 border-t border-slate-50 pt-4">
                   <div>
                     <p className="text-slate-400 text-xs uppercase font-medium">Open Rate</p>
-                    <p className="text-lg font-bold text-slate-800 mt-1">42.8%</p>
+                    <p className="text-lg font-bold text-slate-800 mt-1">--</p>
                   </div>
                   <div>
                     <p className="text-slate-400 text-xs uppercase font-medium">Last Sent</p>
-                    <p className="text-lg font-bold text-slate-800 mt-1">3d ago</p>
+                    <p className="text-lg font-bold text-slate-800 mt-1">--</p>
                   </div>
                 </div>
                 <Link 
