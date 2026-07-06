@@ -11,7 +11,12 @@ import {
   deleteSubscriberServer,
   addCampaignServer,
   getBlogSettingsServer,
-  updateBlogSettingsServer
+  updateBlogSettingsServer,
+  getCommentsForPostServer,
+  addCommentServer,
+  getPendingCommentsServer,
+  approveCommentServer,
+  deleteCommentServer
 } from './sanityActions';
 
 export interface Post {
@@ -33,6 +38,18 @@ export interface Post {
 export interface BlogSettings {
   heroLayout: 'single' | 'carousel';
   selectedHeroPostId?: string;
+}
+
+export interface BlogComment {
+  id: string;
+  postSlug: string;
+  name: string;
+  email: string;
+  content: string;
+  avatar: string;
+  likes: number;
+  status: 'pending' | 'approved';
+  createdAt: string;
 }
 
 export interface Subscriber {
@@ -151,4 +168,26 @@ export async function getBlogSettings(): Promise<BlogSettings> {
 
 export async function updateBlogSettings(settings: BlogSettings): Promise<void> {
   await updateBlogSettingsServer(settings);
+}
+
+// --- Comments Actions ---
+
+export async function getApprovedComments(postSlug: string): Promise<BlogComment[]> {
+  return getCommentsForPostServer(postSlug);
+}
+
+export async function addComment(comment: Omit<BlogComment, 'id' | 'likes' | 'status' | 'createdAt'>): Promise<{ success: boolean; id: string }> {
+  return addCommentServer(comment);
+}
+
+export async function getPendingComments(): Promise<BlogComment[]> {
+  return getPendingCommentsServer();
+}
+
+export async function approveComment(id: string): Promise<void> {
+  await approveCommentServer(id);
+}
+
+export async function deleteComment(id: string): Promise<void> {
+  await deleteCommentServer(id);
 }

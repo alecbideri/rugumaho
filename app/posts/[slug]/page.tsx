@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
-import { getPostBySlug, getPosts, Post } from "../../../lib/mockData";
+import { getPostBySlug, getPosts, Post, getApprovedComments, addComment } from "../../../lib/mockData";
 import { 
   Calendar, 
   User, 
@@ -13,7 +13,8 @@ import {
   Bookmark, 
   Link as LinkIcon, 
   ThumbsUp, 
-  ChevronDown 
+  ChevronDown,
+  CheckCircle
 } from "lucide-react";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
@@ -73,7 +74,10 @@ export default function BlogPostPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const [post, setPost] = useState<Post | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [comments, setComments] = useState<Comment[]>(DEFAULT_COMMENTS);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentName, setCommentName] = useState("");
+  const [commentEmail, setCommentEmail] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [newCommentText, setNewCommentText] = useState("");
   const [recommended, setRecommended] = useState<Post[]>([]);
   const [commentComposerFocused, setCommentComposerFocused] = useState(false);
@@ -87,6 +91,20 @@ export default function BlogPostPage({ params }: PageProps) {
     }).catch((err) => {
       console.error("Error fetching post by slug:", err);
       setMounted(true);
+    });
+
+    getApprovedComments(resolvedParams.slug).then((data) => {
+      const mapped = data.map((c) => ({
+        id: c.id,
+        author: c.name,
+        avatar: c.avatar,
+        content: c.content,
+        time: new Date(c.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+        likes: c.likes || 0
+      }));
+      setComments(mapped);
+    }).catch(err => {
+      console.error("Failed to load approved comments:", err);
     });
   }, [resolvedParams.slug]);
 
@@ -145,20 +163,30 @@ export default function BlogPostPage({ params }: PageProps) {
 
   const handlePostComment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCommentText.trim()) return;
+    if (!newCommentText.trim() || !commentName.trim() || !commentEmail.trim()) return;
 
-    const newComment: Comment = {
-      id: `c-user-${Date.now()}`,
-      author: "Guest Explorer",
-      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuCCILgCbmO9BoZ92G-jMDt55p5rrjWEzCHEybwrHUFaadKeABiyJx-CV8PfeiZGAQSPQey_HKStW0YE7QtCocGyLkO33QA2Eb3tOPf2A3Ykq59390_y-f7a5703qvR6mIMqVYW0ubG85AsFASMx3ENhmQhmus0e248eRPYijWHE1ZC-ZfVjkKmZdTkJWaFCZewLfJb1QI2ilzZX3QnEDsZnqiHs7evHoaouTN6w85BsnH4OsJuA1pikvN89cj2Wck8OWb4__zvrgBg",
+    // Initials Avatar generator
+    const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(commentName.trim())}`;
+
+    const newCommentData = {
+      postSlug: resolvedParams.slug,
+      name: commentName.trim(),
+      email: commentEmail.trim(),
       content: newCommentText.trim(),
-      time: "Just now",
-      likes: 0
+      avatar: avatarUrl
     };
 
-    setComments([newComment, ...comments]);
-    setNewCommentText("");
-    setCommentComposerFocused(false);
+    addComment(newCommentData).then(() => {
+      setIsSubmitted(true);
+      setNewCommentText("");
+      setCommentName("");
+      setCommentEmail("");
+      setCommentComposerFocused(false);
+      setTimeout(() => setIsSubmitted(false), 7000);
+    }).catch((err) => {
+      console.error("Failed to submit comment:", err);
+      alert("Failed to submit comment. Please try again.");
+    });
   };
 
   const handleLikeComment = (commentId: string) => {
@@ -412,54 +440,83 @@ export default function BlogPostPage({ params }: PageProps) {
             </div>
           </div>
 
+          {isSubmitted && (
+            <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-800 dark:text-emerald-300 text-sm font-semibold flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+              Thank you! Your comment has been submitted and is awaiting moderation approval.
+            </div>
+          )}
+
           {/* Comment Composer */}
           <form 
             onSubmit={handlePostComment}
             className="comment-composer group mb-12 rounded-xl border border-slate-200 bg-white p-4 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 transition-all"
           >
             <div className="flex gap-4">
-              <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border border-slate-100 bg-slate-50">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img 
-                  className="h-full w-full object-cover" 
-                  alt="Current user avatar" 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCILgCbmO9BoZ92G-jMDt55p5rrjWEzCHEybwrHUFaadKeABiyJx-CV8PfeiZGAQSPQey_HKStW0YE7QtCocGyLkO33QA2Eb3tOPf2A3Ykq59390_y-f7a5703qvR6mIMqVYW0ubG85AsFASMx3ENhmQhmus0e248eRPYijWHE1ZC-ZfVjkKmZdTkJWaFCZewLfJb1QI2ilzZX3QnEDsZnqiHs7evHoaouTN6w85BsnH4OsJuA1pikvN89cj2Wck8OWb4__zvrgBg"
-                />
+              <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border border-slate-100 bg-slate-50 flex items-center justify-center text-slate-400">
+                <User className="w-5 h-5" />
               </div>
               <textarea 
                 value={newCommentText}
                 onChange={(e) => setNewCommentText(e.target.value)}
                 onFocus={() => setCommentComposerFocused(true)}
-                className="w-full resize-none border-none p-0 text-slate-705 placeholder-slate-400 focus:ring-0 outline-none text-sm" 
+                className="w-full resize-none border-none p-0 text-slate-700 placeholder-slate-400 focus:ring-0 outline-none text-sm" 
                 placeholder="Join the conversation..." 
                 rows={2}
               />
             </div>
             
             {(commentComposerFocused || newCommentText.length > 0) && (
-              <div className="composer-toolbar mt-4 flex items-center justify-between border-t border-slate-100 pt-4 transition-all duration-300">
-                <div className="flex items-center gap-4 text-slate-400">
-                  <span className="text-xs font-semibold hover:text-primary cursor-pointer">B</span>
-                  <span className="text-xs font-semibold italic hover:text-primary cursor-pointer">I</span>
-                  <span className="text-xs font-semibold hover:text-primary cursor-pointer">Link</span>
+              <div className="composer-toolbar mt-4 pt-4 border-t border-slate-100 flex flex-col gap-4 transition-all duration-300">
+                {/* Name & Email inputs for anonymous comments */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    required
+                    value={commentName}
+                    onChange={(e) => setCommentName(e.target.value)}
+                    placeholder="Your Name (required)"
+                    className="bg-slate-50 border border-slate-250 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-primary/25 focus:border-primary outline-none text-slate-700 font-semibold"
+                  />
+                  <input
+                    type="email"
+                    required
+                    value={commentEmail}
+                    onChange={(e) => setCommentEmail(e.target.value)}
+                    placeholder="Your Email (required, hidden)"
+                    className="bg-slate-50 border border-slate-255 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-primary/25 focus:border-primary outline-none text-slate-700 font-semibold"
+                  />
                 </div>
-                <div className="flex items-center gap-6">
-                  <span className="text-xs text-slate-400">{newCommentText.length} / 500</span>
-                  <div className="flex gap-3">
-                    <button 
-                      type="button"
-                      onClick={() => { setNewCommentText(""); setCommentComposerFocused(false); }}
-                      className="text-sm font-bold text-slate-500 hover:text-slate-900 cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      type="submit"
-                      disabled={!newCommentText.trim()}
-                      className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-slate-900 hover:opacity-90 disabled:opacity-50 transition-all cursor-pointer"
-                    >
-                      Post
-                    </button>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 text-slate-400">
+                    <span className="text-xs font-semibold hover:text-primary cursor-pointer">B</span>
+                    <span className="text-xs font-semibold italic hover:text-primary cursor-pointer">I</span>
+                    <span className="text-xs font-semibold hover:text-primary cursor-pointer">Link</span>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <span className="text-xs text-slate-400">{newCommentText.length} / 500</span>
+                    <div className="flex gap-3">
+                      <button 
+                        type="button"
+                        onClick={() => { 
+                          setNewCommentText(""); 
+                          setCommentName("");
+                          setCommentEmail("");
+                          setCommentComposerFocused(false); 
+                        }}
+                        className="text-sm font-bold text-slate-500 hover:text-slate-900 cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        type="submit"
+                        disabled={!newCommentText.trim() || !commentName.trim() || !commentEmail.trim()}
+                        className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-slate-900 hover:opacity-90 disabled:opacity-50 transition-all cursor-pointer"
+                      >
+                        Post Comment
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

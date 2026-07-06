@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getPosts, deletePost, Post, getBlogSettings, updateBlogSettings, BlogSettings } from "../../../lib/mockData";
+import { getPosts, deletePost, Post, getBlogSettings, updateBlogSettings, BlogSettings, BlogComment, getPendingComments, approveComment, deleteComment } from "../../../lib/mockData";
 import { 
   Plus, 
   ArrowRight, 
@@ -24,6 +24,7 @@ export default function AdminDashboard() {
   const [mounted, setMounted] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
   const [settings, setSettings] = useState<BlogSettings>({ heroLayout: 'carousel' });
+  const [pendingComments, setPendingComments] = useState<BlogComment[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -39,6 +40,12 @@ export default function AdminDashboard() {
       setSettings(data);
     }).catch((err) => {
       console.error("Failed to load global layout settings:", err);
+    });
+
+    getPendingComments().then((commentsData) => {
+      setPendingComments(commentsData);
+    }).catch(err => {
+      console.error("Failed to load pending comments:", err);
     });
     
     // Format date string dynamically on client
@@ -66,6 +73,28 @@ export default function AdminDashboard() {
       }).catch(err => {
         console.error("Error deleting post from Sanity:", err);
       });
+    }
+  };
+
+  const handleApproveComment = async (id: string) => {
+    try {
+      await approveComment(id);
+      setPendingComments(prev => prev.filter(c => c.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to approve comment");
+    }
+  };
+
+  const handleDeleteComment = async (id: string) => {
+    const confirmDelete = confirm("Are you sure you want to reject and delete this comment?");
+    if (!confirmDelete) return;
+    try {
+      await deleteComment(id);
+      setPendingComments(prev => prev.filter(c => c.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete comment");
     }
   };
 
@@ -358,6 +387,61 @@ export default function AdminDashboard() {
                       <p className="text-[11px] text-slate-400 italic">
                         Select a published post to display as the single landing page hero.
                       </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Comments Moderation Queue Card */}
+            {mounted && (
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-6 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between">
+                  <h4 className="font-serif text-xl font-bold text-slate-800">Pending Comments</h4>
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary">
+                    {pendingComments.length}
+                  </span>
+                </div>
+                <div className="p-6">
+                  {pendingComments.length === 0 ? (
+                    <div className="text-center py-6 text-slate-400 text-xs font-medium">
+                      All caught up! No pending comments.
+                    </div>
+                  ) : (
+                    <div className="space-y-4 max-h-[320px] overflow-y-auto pr-1">
+                      {pendingComments.map((comment) => (
+                        <div key={comment.id} className="p-3 bg-slate-50 rounded-lg border border-slate-100 text-xs space-y-2">
+                          <div className="flex justify-between items-start gap-2">
+                            <div>
+                              <p className="font-bold text-slate-905">{comment.name}</p>
+                              <p className="text-[10px] text-slate-400 font-medium truncate max-w-[150px]">{comment.email}</p>
+                            </div>
+                            <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[9px] font-bold">
+                              Pending
+                            </span>
+                          </div>
+                          <p className="text-slate-600 line-clamp-3 leading-relaxed italic">
+                            &ldquo;{comment.content}&rdquo;
+                          </p>
+                          <div className="text-[10px] text-slate-400 font-semibold truncate">
+                            Story slug: <span className="underline">{comment.postSlug}</span>
+                          </div>
+                          <div className="flex gap-2 pt-1">
+                            <button
+                              onClick={() => handleApproveComment(comment.id)}
+                              className="bg-emerald-500 hover:bg-emerald-600 text-white rounded px-2.5 py-1 text-[10px] font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 flex items-center gap-1"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => handleDeleteComment(comment.id)}
+                              className="bg-red-500 hover:bg-red-600 text-white rounded px-2.5 py-1 text-[10px] font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 flex items-center gap-1"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

@@ -296,3 +296,105 @@ export async function updateBlogSettingsServer(settings: { heroLayout: 'single' 
     throw new Error(error.message || "Failed to update layout settings in Sanity.");
   }
 }
+
+// --- Comments Actions ---
+
+export async function getCommentsForPostServer(postSlug: string) {
+  try {
+    const comments = await sanityWriteClient.fetch(
+      `*[_type == "comment" && postSlug == $postSlug && status == "approved"] | order(createdAt desc) {
+        "id": _id,
+        postSlug,
+        name,
+        email,
+        content,
+        avatar,
+        likes,
+        status,
+        createdAt
+      }`,
+      { postSlug }
+    );
+    return comments || [];
+  } catch (error) {
+    console.error("Error fetching comments on server:", error);
+    return [];
+  }
+}
+
+export async function addCommentServer(commentData: {
+  postSlug: string;
+  name: string;
+  email: string;
+  content: string;
+  avatar: string;
+}) {
+  try {
+    const doc = {
+      _type: 'comment',
+      postSlug: commentData.postSlug,
+      name: commentData.name,
+      email: commentData.email,
+      content: commentData.content,
+      avatar: commentData.avatar,
+      likes: 0,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+
+    const created = await sanityWriteClient.create(doc);
+    return {
+      success: true,
+      id: created._id
+    };
+  } catch (error: any) {
+    console.error("Error adding comment in Sanity:", error);
+    throw new Error(error.message || "Failed to submit comment.");
+  }
+}
+
+export async function getPendingCommentsServer() {
+  try {
+    const comments = await sanityWriteClient.fetch(
+      `*[_type == "comment" && status == "pending"] | order(createdAt desc) {
+        "id": _id,
+        postSlug,
+        name,
+        email,
+        content,
+        avatar,
+        likes,
+        status,
+        createdAt
+      }`
+    );
+    return comments || [];
+  } catch (error) {
+    console.error("Error fetching pending comments:", error);
+    return [];
+  }
+}
+
+export async function approveCommentServer(id: string) {
+  try {
+    await sanityWriteClient
+      .patch(id)
+      .set({ status: 'approved' })
+      .commit();
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error approving comment in Sanity:", error);
+    throw new Error(error.message || "Failed to approve comment.");
+  }
+}
+
+export async function deleteCommentServer(id: string) {
+  try {
+    await sanityWriteClient.delete(id);
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error deleting comment in Sanity:", error);
+    throw new Error(error.message || "Failed to delete comment.");
+  }
+}
+
