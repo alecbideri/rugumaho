@@ -22,7 +22,8 @@ import {
   Eye,
   Sparkles,
   CheckCircle,
-  Flower
+  Flower,
+  ArrowRight
 } from "lucide-react";
 import { getPosts, addPost, updatePost, Post } from "../../../../lib/mockData";
 import { uploadImageToImageKit } from "../../../../lib/imagekitActions";
@@ -62,6 +63,53 @@ function NewPostEditor() {
   const [showToast, setShowToast] = useState<string | null>(null);
   const [isFeatured, setIsFeatured] = useState(false);
   const [isUploadingFeatured, setIsUploadingFeatured] = useState(false);
+
+  const [modal, setModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'confirm' | 'prompt' | 'choice';
+    placeholder?: string;
+    inputValue?: string;
+    confirmText?: string;
+    cancelText?: string;
+    choiceOptions?: { label: string; action: () => void }[];
+    onConfirm: (val?: string) => void;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "confirm",
+    onConfirm: () => {}
+  });
+
+  const showChoiceModal = (title: string, message: string, choices: { label: string; action: () => void }[]) => {
+    setModal({
+      isOpen: true,
+      title,
+      message,
+      type: 'choice',
+      choiceOptions: choices,
+      onConfirm: () => {}
+    });
+  };
+
+  const showPromptModal = (title: string, message: string, defaultValue: string, placeholder: string, onConfirm: (val: string) => void) => {
+    setModal({
+      isOpen: true,
+      title,
+      message,
+      type: 'prompt',
+      inputValue: defaultValue,
+      placeholder,
+      confirmText: 'Insert',
+      cancelText: 'Cancel',
+      onConfirm: (val) => {
+        onConfirm(val || "");
+        setModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
 
   const editorRef = useRef<HTMLDivElement>(null);
   const titleTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -135,10 +183,15 @@ function NewPostEditor() {
   };
 
   const handleLinkButton = () => {
-    const url = prompt("Enter the URL link:");
-    if (url) {
-      formatText("createLink", url);
-    }
+    showPromptModal(
+      "Insert Link",
+      "Enter the destination web address (URL):",
+      "",
+      "https://example.com",
+      (url) => {
+        if (url.trim()) formatText("createLink", url.trim());
+      }
+    );
   };
 
   const getYouTubeEmbedUrl = (url: string): string | null => {
@@ -151,15 +204,32 @@ function NewPostEditor() {
   };
 
   const handleImageButton = () => {
-    const choice = confirm("Would you like to upload a local image from your computer?\n\n(Click 'OK' to select a file, or click 'Cancel' to input a web link/URL instead.)");
-    if (choice) {
-      inlineFileInputRef.current?.click();
-    } else {
-      const url = prompt("Enter the image web URL:");
-      if (url) {
-        formatText("insertImage", url);
-      }
-    }
+    showChoiceModal(
+      "Insert Image",
+      "Choose how you want to add an image to your story:",
+      [
+        {
+          label: "Upload from computer",
+          action: () => inlineFileInputRef.current?.click()
+        },
+        {
+          label: "Insert image web link (URL)",
+          action: () => {
+            setTimeout(() => {
+              showPromptModal(
+                "Insert Image URL",
+                "Enter the direct web address (URL) of the image:",
+                "",
+                "https://example.com/image.jpg",
+                (url) => {
+                  if (url.trim()) formatText("insertImage", url.trim());
+                }
+              );
+            }, 300);
+          }
+        }
+      ]
+    );
   };
 
   const handleInlineFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -188,17 +258,23 @@ function NewPostEditor() {
   };
 
   const handleVideoButton = () => {
-    const embedCode = prompt("Enter video YouTube URL or iframe embed code:");
-    if (embedCode) {
-      const ytEmbed = getYouTubeEmbedUrl(embedCode);
-      if (ytEmbed) {
-        formatText("insertHTML", `<iframe src="${ytEmbed}" class="w-full aspect-video rounded-lg my-4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`);
-      } else if (embedCode.includes("<iframe")) {
-        formatText("insertHTML", `<div class="aspect-video w-full my-4">${embedCode}</div>`);
-      } else {
-        formatText("insertHTML", `<video src="${embedCode}" controls class="w-full my-4 rounded-lg" />`);
+    showPromptModal(
+      "Insert Video",
+      "Paste a YouTube video link or iframe embed code:",
+      "",
+      "https://www.youtube.com/watch?v=...",
+      (embedCode) => {
+        if (!embedCode.trim()) return;
+        const ytEmbed = getYouTubeEmbedUrl(embedCode);
+        if (ytEmbed) {
+          formatText("insertHTML", `<iframe src="${ytEmbed}" class="w-full aspect-video rounded-lg my-4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`);
+        } else if (embedCode.includes("<iframe")) {
+          formatText("insertHTML", `<div class="aspect-video w-full my-4">${embedCode}</div>`);
+        } else {
+          formatText("insertHTML", `<video src="${embedCode}" controls class="w-full my-4 rounded-lg" />`);
+        }
       }
-    }
+    );
   };
 
   const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -217,15 +293,32 @@ function NewPostEditor() {
   };
 
   const handleEditFeaturedImage = () => {
-    const choice = confirm("Would you like to upload a local cover image from your computer?\n\n(Click 'OK' to select a file, or click 'Cancel' to input a web link/URL instead.)");
-    if (choice) {
-      featuredFileInputRef.current?.click();
-    } else {
-      const url = prompt("Enter cover image web URL:", coverImage);
-      if (url) {
-        setCoverImage(url);
-      }
-    }
+    showChoiceModal(
+      "Set Cover Image",
+      "Choose how you want to set your featured cover image:",
+      [
+        {
+          label: "Upload from computer",
+          action: () => featuredFileInputRef.current?.click()
+        },
+        {
+          label: "Insert image web link (URL)",
+          action: () => {
+            setTimeout(() => {
+              showPromptModal(
+                "Cover Image URL",
+                "Enter the direct web address (URL) of the cover photo:",
+                coverImage || "",
+                "https://example.com/cover.jpg",
+                (url) => {
+                  if (url.trim()) setCoverImage(url.trim());
+                }
+              );
+            }, 300);
+          }
+        }
+      ]
+    );
   };
 
   const handleFeaturedFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -787,6 +880,81 @@ function NewPostEditor() {
                 dangerouslySetInnerHTML={{ __html: content || "<p class='italic text-slate-400'>Write content to see preview...</p>" }}
               />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Premium Modal Dialog */}
+      {modal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in text-left">
+          <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-105 dark:border-slate-800 p-6 space-y-6 animate-scale-in">
+            <div className="space-y-2">
+              <h3 className="text-lg font-serif font-bold text-slate-900 dark:text-white">
+                {modal.title}
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                {modal.message}
+              </p>
+            </div>
+
+            {/* Input field for Prompts */}
+            {modal.type === 'prompt' && (
+              <input
+                type="text"
+                value={modal.inputValue || ""}
+                onChange={(e) => setModal(prev => ({ ...prev, inputValue: e.target.value }))}
+                placeholder={modal.placeholder}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none text-slate-900 dark:text-white font-medium"
+                autoFocus
+              />
+            )}
+
+            {/* Choice buttons */}
+            {modal.type === 'choice' && modal.choiceOptions && (
+              <div className="flex flex-col gap-3">
+                {modal.choiceOptions.map((opt, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      opt.action();
+                      setModal(prev => ({ ...prev, isOpen: false }));
+                    }}
+                    className="w-full bg-slate-50 dark:bg-slate-800 hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-left text-sm font-semibold transition-all cursor-pointer flex items-center justify-between group text-slate-700 dark:text-slate-300"
+                  >
+                    <span>{opt.label}</span>
+                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setModal(prev => ({ ...prev, isOpen: false }))}
+                  className="w-full text-center text-xs font-bold text-slate-400 hover:text-slate-650 pt-2 cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+
+            {/* Actions for Prompt */}
+            {modal.type !== 'choice' && (
+              <div className="flex justify-end gap-3 border-t border-slate-50 dark:border-slate-850 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setModal(prev => ({ ...prev, isOpen: false }))}
+                  className="px-4 py-2 text-sm font-bold text-slate-450 dark:text-slate-400 hover:text-slate-905 dark:hover:text-white cursor-pointer"
+                >
+                  {modal.cancelText || 'Cancel'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => modal.onConfirm(modal.inputValue)}
+                  className="px-5 py-2 text-sm font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary dark:hover:bg-primary dark:hover:text-slate-900 rounded-lg transition-all cursor-pointer"
+                >
+                  {modal.confirmText || 'Confirm'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

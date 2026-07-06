@@ -25,6 +25,18 @@ export default function AdminDashboard() {
   const [currentDate, setCurrentDate] = useState("");
   const [settings, setSettings] = useState<BlogSettings>({ heroLayout: 'carousel' });
   const [pendingComments, setPendingComments] = useState<BlogComment[]>([]);
+  const [modal, setModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmText?: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: () => {}
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -67,13 +79,20 @@ export default function AdminDashboard() {
   };
 
   const handleDelete = (id: string, title: string) => {
-    if (confirm(`Are you sure you want to delete "${title}"?`)) {
-      deletePost(id).then(() => {
-        getPosts().then(data => setPosts(data));
-      }).catch(err => {
-        console.error("Error deleting post from Sanity:", err);
-      });
-    }
+    setModal({
+      isOpen: true,
+      title: "Delete Story?",
+      message: `Are you sure you want to permanently delete "${title}"? This action cannot be undone and will delete it from Sanity.`,
+      confirmText: "Delete",
+      onConfirm: () => {
+        deletePost(id).then(() => {
+          getPosts().then(data => setPosts(data));
+        }).catch(err => {
+          console.error("Error deleting post from Sanity:", err);
+        });
+        setModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleApproveComment = async (id: string) => {
@@ -87,15 +106,22 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteComment = async (id: string) => {
-    const confirmDelete = confirm("Are you sure you want to reject and delete this comment?");
-    if (!confirmDelete) return;
-    try {
-      await deleteComment(id);
-      setPendingComments(prev => prev.filter(c => c.id !== id));
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete comment");
-    }
+    setModal({
+      isOpen: true,
+      title: "Reject Comment?",
+      message: "Are you sure you want to reject and delete this comment? It will be removed from your database.",
+      confirmText: "Reject",
+      onConfirm: async () => {
+        try {
+          await deleteComment(id);
+          setPendingComments(prev => prev.filter(c => c.id !== id));
+        } catch (err) {
+          console.error(err);
+          alert("Failed to delete comment");
+        }
+        setModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   // Helper for category badge classes matching user mockup
@@ -512,6 +538,43 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Custom Premium Modal Dialog */}
+      {modal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-100 p-6 space-y-6 animate-scale-in text-left">
+            <div className="space-y-2">
+              <h3 className="text-lg font-serif font-bold text-slate-900">
+                {modal.title}
+              </h3>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                {modal.message}
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-3 border-t border-slate-50 pt-4">
+              <button
+                type="button"
+                onClick={() => setModal(prev => ({ ...prev, isOpen: false }))}
+                className="px-4 py-2 text-sm font-bold text-slate-400 hover:text-slate-900 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={modal.onConfirm}
+                className={`px-5 py-2 text-sm font-bold rounded-lg transition-all cursor-pointer ${
+                  modal.confirmText === 'Delete' || modal.confirmText === 'Reject'
+                    ? "bg-red-500 hover:bg-red-650 text-white"
+                    : "bg-slate-900 hover:bg-slate-800 text-white"
+                }`}
+              >
+                {modal.confirmText || 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -89,6 +89,13 @@ export default function BlogPostPage({ params }: PageProps) {
   const [replyName, setReplyName] = useState("");
   const [replyEmail, setReplyEmail] = useState("");
 
+  const [toast, setToast] = useState<string | null>(null);
+
+  const triggerToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
   const isAuthor = (name: string, email?: string) => {
     const lowercaseEmail = email?.toLowerCase().trim();
     return (name === "Ariane Rugumaho" || (post && name === post.author)) && 
@@ -334,7 +341,7 @@ export default function BlogPostPage({ params }: PageProps) {
           onClick={() => {
             if (typeof navigator !== "undefined") {
               navigator.clipboard.writeText(window.location.href);
-              alert("Link copied to clipboard!");
+              triggerToast("Link copied to clipboard!");
             }
           }}
           className="group flex h-10 w-10 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm hover:border-primary transition-all cursor-pointer"
@@ -352,18 +359,12 @@ export default function BlogPostPage({ params }: PageProps) {
         >
           <MessageCircle className="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" />
         </button>
-        <button 
-          className="group flex h-10 w-10 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm hover:border-primary transition-all cursor-pointer"
-          title="Bookmark story"
-        >
-          <Bookmark className="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" />
-        </button>
         <div className="h-10 w-px bg-slate-100 self-center"></div>
         <button 
           onClick={() => {
             if (typeof navigator !== "undefined") {
               navigator.clipboard.writeText(window.location.href);
-              alert("Story link copied!");
+              triggerToast("Story link copied to clipboard!");
             }
           }}
           className="group flex h-10 w-10 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm hover:border-primary transition-all cursor-pointer"
@@ -766,6 +767,13 @@ export default function BlogPostPage({ params }: PageProps) {
           </button>
         </section>
       </main>
+
+      {toast && (
+        <div className="fixed bottom-8 left-8 z-50 bg-slate-900 dark:bg-slate-800 text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 text-sm font-bold border border-slate-800 dark:border-slate-700 animate-fade-in-up">
+          <CheckCircle className="w-4.5 h-4.5 text-primary" />
+          {toast}
+        </div>
+      )}
 
       <Footer />
     </div>
