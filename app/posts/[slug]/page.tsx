@@ -90,6 +90,7 @@ export default function BlogPostPage({ params }: PageProps) {
   const [replyEmail, setReplyEmail] = useState("");
 
   const [toast, setToast] = useState<string | null>(null);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const triggerToast = (msg: string) => {
     setToast(msg);
@@ -338,12 +339,7 @@ export default function BlogPostPage({ params }: PageProps) {
       {/* Floating Left Sidebar Social Actions */}
       <aside className="fixed left-12 top-1/2 hidden -translate-y-1/2 flex-col gap-6 xl:flex z-40">
         <button 
-          onClick={() => {
-            if (typeof navigator !== "undefined") {
-              navigator.clipboard.writeText(window.location.href);
-              triggerToast("Link copied to clipboard!");
-            }
-          }}
+          onClick={() => setIsShareModalOpen(true)}
           className="group flex h-10 w-10 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm hover:border-primary transition-all cursor-pointer"
           title="Share page link"
         >
@@ -772,6 +768,112 @@ export default function BlogPostPage({ params }: PageProps) {
         <div className="fixed bottom-8 left-8 z-50 bg-slate-900 dark:bg-slate-800 text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 text-sm font-bold border border-slate-800 dark:border-slate-700 animate-fade-in-up">
           <CheckCircle className="w-4.5 h-4.5 text-primary" />
           {toast}
+        </div>
+      )}
+
+      {/* Custom Share Modal */}
+      {isShareModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in text-left">
+          <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 p-6 space-y-6 animate-scale-in">
+            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+              <h3 className="text-base font-serif font-bold text-slate-900 dark:text-white">
+                Share this Story
+              </h3>
+              <button 
+                onClick={() => setIsShareModalOpen(false)}
+                className="text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              {/* X / Twitter */}
+              <a
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&text=${encodeURIComponent(post.title)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsShareModalOpen(false)}
+                className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 rounded-xl transition-all font-semibold text-xs text-slate-700 dark:text-slate-350 cursor-pointer"
+              >
+                <div className="size-8 rounded bg-black text-white flex items-center justify-center font-black">
+                  X
+                </div>
+                <span>Share on X</span>
+              </a>
+
+              {/* Facebook */}
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsShareModalOpen(false)}
+                className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 rounded-xl transition-all font-semibold text-xs text-slate-700 dark:text-slate-350 cursor-pointer"
+              >
+                <div className="size-8 rounded bg-[#1877F2] text-white flex items-center justify-center">
+                  <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24">
+                    <path d="M9 8H7v3h2v9h4v-9h3.6l.4-3H13V6c0-.5.5-1 1-1h2V1H13a5 5 0 0 0-5 5v2z"/>
+                  </svg>
+                </div>
+                <span>Facebook</span>
+              </a>
+
+              {/* LinkedIn */}
+              <a
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsShareModalOpen(false)}
+                className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 rounded-xl transition-all font-semibold text-xs text-slate-700 dark:text-slate-350 cursor-pointer"
+              >
+                <div className="size-8 rounded bg-[#0A66C2] text-white flex items-center justify-center">
+                  <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                  </svg>
+                </div>
+                <span>LinkedIn</span>
+              </a>
+
+              {/* WhatsApp */}
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(post.title + ' ' + (typeof window !== 'undefined' ? window.location.href : ''))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsShareModalOpen(false)}
+                className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 rounded-xl transition-all font-semibold text-xs text-slate-700 dark:text-slate-350 cursor-pointer"
+              >
+                <div className="size-8 rounded bg-[#25D366] text-white flex items-center justify-center font-bold text-xs">
+                  WA
+                </div>
+                <span>WhatsApp</span>
+              </a>
+            </div>
+
+            {/* Copy link option inside Share Drawer */}
+            <div className="space-y-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Or Copy Link</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={typeof window !== 'undefined' ? window.location.href : ''}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-205 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-500 truncate outline-none select-all font-semibold"
+                />
+                <button
+                  onClick={() => {
+                    if (typeof navigator !== 'undefined') {
+                      navigator.clipboard.writeText(window.location.href);
+                      triggerToast("Link copied to clipboard!");
+                      setIsShareModalOpen(false);
+                    }
+                  }}
+                  className="bg-slate-905 dark:bg-white text-white dark:text-slate-900 rounded-lg px-3 text-xs font-bold transition-all cursor-pointer whitespace-nowrap"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
