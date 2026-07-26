@@ -21,7 +21,7 @@ export default function Footer() {
         
         {/* Copyright */}
         <div className="text-center text-[10px] uppercase tracking-[0.2em] text-slate-400">
-          &copy; {new Date().getFullYear()} Rugumaho Stories. All rights reserved.
+          &copy; {new Date().getFullYear()} Rugumaho. All rights reserved.
         </div>
       </div>
     </footer>
