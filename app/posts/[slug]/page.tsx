@@ -258,7 +258,7 @@ export default function BlogPostPage({ params }: PageProps) {
       setTimeout(() => setIsSubmitted(false), 7000);
     }).catch((err) => {
       console.error("Failed to submit comment:", err);
-      alert("Failed to submit comment. Please try again.");
+      alert("Failed to submit comment: " + (err.message || "Please try again."));
     });
   };
 
@@ -286,7 +286,7 @@ export default function BlogPostPage({ params }: PageProps) {
       setTimeout(() => setIsSubmitted(false), 7000);
     }).catch((err) => {
       console.error("Failed to submit reply:", err);
-      alert("Failed to submit reply. Please try again.");
+      alert("Failed to submit reply: " + (err.message || "Please try again."));
     });
   };
 
