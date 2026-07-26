@@ -298,9 +298,9 @@ export default function AdminDashboard() {
                             </span>
                           </td>
                           
-                          {/* Mock Views */}
+                          {/* Real Views */}
                           <td className="px-6 py-4 text-slate-600">
-                            {post.status === "published" ? "1,240" : "0"}
+                            {post.status === "published" ? (post.views || 0).toLocaleString() : "0"}
                           </td>
                           
                           {/* Actions */}
