@@ -442,18 +442,25 @@ function NewPostEditor() {
     e.target.value = "";
   };
 
+  const getDynamicWordCount = () => {
+    if (typeof document === "undefined" || !editorRef.current) return 0;
+    const text = editorRef.current.innerText || "";
+    const cleanText = text.trim();
+    if (!cleanText || cleanText === "Start writing your story here...") return 0;
+    return cleanText.split(/\s+/).filter(w => w.length > 0).length;
+  };
+
+  const getDynamicReadTime = () => {
+    const words = getDynamicWordCount();
+    const minutes = Math.max(1, Math.round(words / 200));
+    return `${minutes} min read`;
+  };
+
   const handleSave = (statusToSave: "draft" | "published") => {
     if (!title.trim()) {
       alert("Please enter a story title before saving.");
       return;
     }
-
-    const calculatedReadTime = () => {
-      const text = editorRef.current?.innerText || "";
-      const words = text.trim().split(/\s+/).length;
-      const minutes = Math.max(1, Math.round(words / 200));
-      return `${minutes} min read`;
-    };
 
     const finalContent = editorRef.current && editorRef.current.innerHTML !== "Start writing your story here..."
       ? editorRef.current.innerHTML
@@ -474,7 +481,7 @@ function NewPostEditor() {
       tags,
       author: "Ariane Rugumaho",
       status: statusToSave,
-      readTime: calculatedReadTime(),
+      readTime: getDynamicReadTime(),
       isFeatured
     };
 
@@ -843,6 +850,19 @@ function NewPostEditor() {
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
               />
+            </div>
+
+            {/* Live Stats */}
+            <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl space-y-2 border border-slate-100 dark:border-slate-800">
+              <label className="block text-xs font-bold text-slate-500 uppercase">Story Stats</label>
+              <div className="flex justify-between text-xs font-semibold text-slate-655 dark:text-slate-400">
+                <span className="text-slate-400">Words Count:</span>
+                <span className="text-slate-900 dark:text-white font-bold">{getDynamicWordCount().toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-xs font-semibold text-slate-655 dark:text-slate-400">
+                <span className="text-slate-400">Est. Read Time:</span>
+                <span className="text-primary font-bold">{getDynamicReadTime()}</span>
+              </div>
             </div>
 
             {/* SEO Live Preview Card */}
