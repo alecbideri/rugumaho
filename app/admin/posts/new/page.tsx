@@ -64,6 +64,33 @@ function NewPostEditor() {
   const [isFeatured, setIsFeatured] = useState(false);
   const [isUploadingFeatured, setIsUploadingFeatured] = useState(false);
 
+  const uploadSelectionRef = useRef<Range | null>(null);
+  const [linkModal, setLinkModal] = useState<{
+    isOpen: boolean;
+    text: string;
+    url: string;
+    savedSelection: Range | null;
+  }>({
+    isOpen: false,
+    text: "",
+    url: "",
+    savedSelection: null
+  });
+
+  const [mediaModal, setMediaModal] = useState<{
+    isOpen: boolean;
+    type: "image" | "video";
+    url: string;
+    caption: string;
+    savedSelection: Range | null;
+  }>({
+    isOpen: false,
+    type: "image",
+    url: "",
+    caption: "",
+    savedSelection: null
+  });
+
   const [modal, setModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -182,16 +209,44 @@ function NewPostEditor() {
     }
   };
 
+  const saveCurrentSelection = () => {
+    if (typeof window === "undefined") return null;
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      return sel.getRangeAt(0);
+    }
+    return null;
+  };
+
+  const restoreCurrentSelection = (range: Range | null) => {
+    if (typeof window === "undefined" || !range) return;
+    const sel = window.getSelection();
+    if (sel) {
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  };
+
   const handleLinkButton = () => {
-    showPromptModal(
-      "Insert Link",
-      "Enter the destination web address (URL):",
-      "",
-      "https://example.com",
-      (url) => {
-        if (url.trim()) formatText("createLink", url.trim());
-      }
-    );
+    const savedSel = saveCurrentSelection();
+    const selectedText = savedSel ? savedSel.toString().trim() : "";
+    setLinkModal({
+      isOpen: true,
+      text: selectedText,
+      url: "",
+      savedSelection: savedSel
+    });
+  };
+
+  const handleInsertLink = () => {
+    if (!linkModal.url.trim()) return;
+
+    restoreCurrentSelection(linkModal.savedSelection);
+    const linkText = linkModal.text.trim() || linkModal.url.trim();
+    const linkHTML = `<a href="${linkModal.url.trim()}" target="_blank" class="text-primary hover:underline font-semibold transition-all duration-150">${linkText}</a>`;
+    
+    formatText("insertHTML", linkHTML);
+    setLinkModal({ isOpen: false, text: "", url: "", savedSelection: null });
   };
 
   const getYouTubeEmbedUrl = (url: string): string | null => {
@@ -204,6 +259,7 @@ function NewPostEditor() {
   };
 
   const handleImageButton = () => {
+    uploadSelectionRef.current = saveCurrentSelection();
     showChoiceModal(
       "Insert Image",
       "Choose how you want to add an image to your story:",
@@ -216,20 +272,57 @@ function NewPostEditor() {
           label: "Insert image web link (URL)",
           action: () => {
             setTimeout(() => {
-              showPromptModal(
-                "Insert Image URL",
-                "Enter the direct web address (URL) of the image:",
-                "",
-                "https://example.com/image.jpg",
-                (url) => {
-                  if (url.trim()) formatText("insertImage", url.trim());
-                }
-              );
+              setMediaModal({
+                isOpen: true,
+                type: "image",
+                url: "",
+                caption: "",
+                savedSelection: uploadSelectionRef.current
+              });
             }, 300);
           }
         }
       ]
     );
+  };
+
+  const handleInsertMedia = () => {
+    if (!mediaModal.url.trim()) return;
+
+    restoreCurrentSelection(mediaModal.savedSelection);
+    const captionText = mediaModal.caption.trim() || `Write ${mediaModal.type} caption...`;
+
+    if (mediaModal.type === "image") {
+      const imgHTML = `
+        <div class="my-6 text-center select-none" contenteditable="false">
+          <img src="${mediaModal.url.trim()}" class="rounded-xl max-h-[450px] object-cover w-full shadow-md" alt="Story image" />
+          <p class="text-xs text-slate-400 dark:text-slate-500 mt-2 font-serif italic border-none focus:outline-none" contenteditable="true">${captionText}</p>
+        </div>
+        <p><br></p>
+      `;
+      formatText("insertHTML", imgHTML);
+    } else {
+      const ytEmbed = getYouTubeEmbedUrl(mediaModal.url.trim());
+      let mediaHTML = "";
+      if (ytEmbed) {
+        mediaHTML = `<iframe src="${ytEmbed}" class="w-full aspect-video rounded-xl shadow-md" frameborder="0" allowfullscreen></iframe>`;
+      } else if (mediaModal.url.trim().includes("<iframe")) {
+        mediaHTML = `<div class="aspect-video w-full my-4">${mediaModal.url.trim()}</div>`;
+      } else {
+        mediaHTML = `<video src="${mediaModal.url.trim()}" controls class="w-full my-4 rounded-xl shadow-md" />`;
+      }
+
+      const videoHTML = `
+        <div class="my-6 text-center select-none" contenteditable="false">
+          <div class="w-full rounded-xl overflow-hidden shadow-md bg-slate-900">${mediaHTML}</div>
+          <p class="text-xs text-slate-400 dark:text-slate-500 mt-2 font-serif italic border-none focus:outline-none" contenteditable="true">${captionText}</p>
+        </div>
+        <p><br></p>
+      `;
+      formatText("insertHTML", videoHTML);
+    }
+
+    setMediaModal({ isOpen: false, type: "image", url: "", caption: "", savedSelection: null });
   };
 
   const handleInlineFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -243,7 +336,15 @@ function NewPostEditor() {
         const base64 = reader.result as string;
         const res = await uploadImageToImageKit(base64, file.name);
         if (res.success && res.url) {
-          formatText("insertImage", res.url);
+          restoreCurrentSelection(uploadSelectionRef.current);
+          const imgHTML = `
+            <div class="my-6 text-center select-none" contenteditable="false">
+              <img src="${res.url}" class="rounded-xl max-h-[450px] object-cover w-full shadow-md" alt="Story image" />
+              <p class="text-xs text-slate-400 dark:text-slate-500 mt-2 font-serif italic border-none focus:outline-none" contenteditable="true">Write image caption...</p>
+            </div>
+            <p><br></p>
+          `;
+          formatText("insertHTML", imgHTML);
           triggerToast("Image inserted successfully!");
         } else {
           alert("ImageKit upload failed: " + (res.error || "Unknown error"));
@@ -258,23 +359,14 @@ function NewPostEditor() {
   };
 
   const handleVideoButton = () => {
-    showPromptModal(
-      "Insert Video",
-      "Paste a YouTube video link or iframe embed code:",
-      "",
-      "https://www.youtube.com/watch?v=...",
-      (embedCode) => {
-        if (!embedCode.trim()) return;
-        const ytEmbed = getYouTubeEmbedUrl(embedCode);
-        if (ytEmbed) {
-          formatText("insertHTML", `<iframe src="${ytEmbed}" class="w-full aspect-video rounded-lg my-4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`);
-        } else if (embedCode.includes("<iframe")) {
-          formatText("insertHTML", `<div class="aspect-video w-full my-4">${embedCode}</div>`);
-        } else {
-          formatText("insertHTML", `<video src="${embedCode}" controls class="w-full my-4 rounded-lg" />`);
-        }
-      }
-    );
+    const savedSel = saveCurrentSelection();
+    setMediaModal({
+      isOpen: true,
+      type: "video",
+      url: "",
+      caption: "",
+      savedSelection: savedSel
+    });
   };
 
   const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -470,6 +562,11 @@ function NewPostEditor() {
           width: 100%;
           max-height: 400px;
           object-fit: cover;
+        }
+        .wysiwyg-content div[contenteditable="false"] p[contenteditable="true"]:focus {
+          outline: 1px dashed #2bcdee;
+          border-radius: 4px;
+          padding: 2px 6px;
         }
       ` }} />
 
@@ -955,6 +1052,108 @@ function NewPostEditor() {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Custom Link Modal with captions/text builder */}
+      {linkModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in text-left">
+          <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 animate-scale-in">
+            <h3 className="text-lg font-serif font-bold text-slate-900 dark:text-white">Insert Web Link</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Text to display</label>
+                <input 
+                  type="text" 
+                  value={linkModal.text}
+                  onChange={(e) => setLinkModal(prev => ({ ...prev, text: e.target.value }))}
+                  placeholder="Link text..."
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none text-slate-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">URL (Web address)</label>
+                <input 
+                  type="text" 
+                  value={linkModal.url}
+                  onChange={(e) => setLinkModal(prev => ({ ...prev, url: e.target.value }))}
+                  placeholder="https://example.com"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none text-slate-900 dark:text-white"
+                  autoFocus
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 pt-2 border-t border-slate-50 dark:border-slate-850">
+              <button 
+                type="button"
+                onClick={() => setLinkModal(prev => ({ ...prev, isOpen: false }))}
+                className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-white"
+              >
+                Cancel
+              </button>
+              <button 
+                type="button"
+                onClick={handleInsertLink}
+                disabled={!linkModal.url.trim()}
+                className="px-5 py-2 text-sm font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg disabled:opacity-40"
+              >
+                Insert Link
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Media (Image/Video) Modal with captions builder */}
+      {mediaModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in text-left">
+          <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 animate-scale-in">
+            <h3 className="text-lg font-serif font-bold text-slate-900 dark:text-white capitalize">
+              Insert {mediaModal.type} URL
+            </h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">
+                  {mediaModal.type === 'image' ? 'Direct Image URL' : 'YouTube Link / Embed Code'}
+                </label>
+                <input 
+                  type="text" 
+                  value={mediaModal.url}
+                  onChange={(e) => setMediaModal(prev => ({ ...prev, url: e.target.value }))}
+                  placeholder={mediaModal.type === 'image' ? 'https://example.com/photo.jpg' : 'https://youtube.com/watch?v=...'}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none text-slate-900 dark:text-white"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Caption</label>
+                <input 
+                  type="text" 
+                  value={mediaModal.caption}
+                  onChange={(e) => setMediaModal(prev => ({ ...prev, caption: e.target.value }))}
+                  placeholder="Write a descriptive caption..."
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none text-slate-900 dark:text-white"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 pt-2 border-t border-slate-50 dark:border-slate-850">
+              <button 
+                type="button"
+                onClick={() => setMediaModal(prev => ({ ...prev, isOpen: false }))}
+                className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-650"
+              >
+                Cancel
+              </button>
+              <button 
+                type="button"
+                onClick={handleInsertMedia}
+                disabled={!mediaModal.url.trim()}
+                className="px-5 py-2 text-sm font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg disabled:opacity-40"
+              >
+                Insert Media
+              </button>
+            </div>
           </div>
         </div>
       )}
