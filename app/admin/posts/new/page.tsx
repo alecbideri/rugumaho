@@ -531,7 +531,7 @@ function NewPostEditor() {
           <div className="max-w-[700px] mx-auto relative">
             
             {/* Formatting Sticky Toolbar */}
-            <div className="sticky top-0 z-40 mb-12 flex justify-center">
+            <div className="sticky top-4 z-40 mb-12 flex justify-center">
               <div className="flex items-center gap-1 p-1 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl shadow-xl shadow-slate-200/50 dark:shadow-none">
                 <button 
                   onClick={() => formatText("bold")}
