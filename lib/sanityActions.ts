@@ -450,7 +450,7 @@ async function sendCommentNotificationEmail(comment: {
     const resend = new Resend(apiKey);
     await resend.emails.send({
       from: 'Rugumaho Blog Alerts <onboarding@resend.dev>',
-      to: 'hello@rugumaho.com', // Change this to your preferred admin email
+      to: 'arianebloger@gmail.com', // Change this to your preferred admin email
       subject: `New Comment Pending Moderation on "${comment.postSlug}"`,
       html: `
         <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #f1f5f9; border-radius: 16px; background-color: #ffffff;">
