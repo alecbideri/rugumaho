@@ -2,6 +2,7 @@
 
 import { sanityWriteClient } from './sanity';
 import { Post } from './mockData';
+import { Resend } from 'resend';
 
 // --- Server-Side Read Queries (Bypasses CORS & Private Dataset limitations) ---
 
@@ -348,6 +349,17 @@ export async function addCommentServer(commentData: {
     };
 
     const created = await sanityWriteClient.create(doc);
+
+    // Fire email notification to admin asynchronously (without delaying the reader's UI loading)
+    sendCommentNotificationEmail({
+      postSlug: commentData.postSlug,
+      name: commentData.name,
+      email: commentData.email,
+      content: commentData.content
+    }).catch((err) => {
+      console.error("Failed to execute background email trigger:", err);
+    });
+
     return {
       success: true,
       id: created._id
@@ -419,6 +431,58 @@ export async function incrementPostViewsServer(slug: string) {
     }
   } catch (error) {
     console.error("Error incrementing views on server:", error);
+  }
+}
+
+async function sendCommentNotificationEmail(comment: {
+  postSlug: string;
+  name: string;
+  email: string;
+  content: string;
+}) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.log("RESEND_API_KEY is not defined in env. Skipping notification email.");
+    return;
+  }
+
+  try {
+    const resend = new Resend(apiKey);
+    await resend.emails.send({
+      from: 'Rugumaho Blog Alerts <onboarding@resend.dev>',
+      to: 'hello@rugumaho.com', // Change this to your preferred admin email
+      subject: `New Comment Pending Moderation on "${comment.postSlug}"`,
+      html: `
+        <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #f1f5f9; border-radius: 16px; background-color: #ffffff;">
+          <div style="margin-bottom: 24px; text-align: center;">
+            <span style="font-size: 24px;">💬</span>
+            <h2 style="font-family: Georgia, serif; font-size: 22px; color: #0f172a; margin: 12px 0 4px 0;">New Blog Comment</h2>
+            <p style="font-size: 13px; color: #64748b; margin: 0;">A comment is waiting for your approval in the moderation queue.</p>
+          </div>
+          
+          <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px; border-left: 4px solid #0ea5e9; margin-bottom: 24px;">
+            <p style="margin: 0 0 10px 0; font-size: 13px; color: #475569;">
+              <strong>Author:</strong> ${comment.name} (${comment.email})
+            </p>
+            <p style="margin: 0 0 10px 0; font-size: 13px; color: #475569;">
+              <strong>Article Path:</strong> <span style="font-family: monospace; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">/posts/${comment.postSlug}</span>
+            </p>
+            <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid #e2e8f0; font-size: 14px; color: #334155; font-style: italic; line-height: 1.6;">
+              &ldquo;${comment.content}&rdquo;
+            </div>
+          </div>
+
+          <div style="text-align: center; margin-top: 28px;">
+            <a href="https://rugumaho.com/admin/dashboard" target="_blank" style="background-color: #0f172a; color: #ffffff; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: bold; text-decoration: none; display: inline-block;">
+              Open Moderation Dashboard
+            </a>
+          </div>
+        </div>
+      `
+    });
+    console.log("Successfully sent comment notification email via Resend.");
+  } catch (err) {
+    console.error("Failed to send comment notification email via Resend:", err);
   }
 }
 
