@@ -214,7 +214,7 @@ export default function BlogPostPage({ params }: PageProps) {
         </p>
         <Link 
           href="/" 
-          className="mt-2 bg-primary text-slate-950 px-6 py-2.5 rounded-lg text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors"
+          className="mt-2 bg-primary text-white dark:text-slate-950 px-6 py-2.5 rounded-lg text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors"
         >
           Back to Home
         </Link>
@@ -602,7 +602,7 @@ export default function BlogPostPage({ params }: PageProps) {
                       <button 
                         type="submit"
                         disabled={!newCommentText.trim() || !commentName.trim() || !commentEmail.trim()}
-                        className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-slate-900 hover:opacity-90 disabled:opacity-50 transition-all cursor-pointer"
+                        className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white dark:text-slate-900 hover:opacity-90 disabled:opacity-50 transition-all cursor-pointer"
                       >
                         Post Comment
                       </button>
@@ -712,7 +712,7 @@ export default function BlogPostPage({ params }: PageProps) {
                             <button
                               type="submit"
                               disabled={!replyText.trim() || !replyName.trim() || !replyEmail.trim()}
-                              className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary dark:hover:bg-primary hover:text-slate-900 rounded-lg px-4 py-2 text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
+                              className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary dark:hover:bg-primary hover:text-white dark:hover:text-slate-900 rounded-lg px-4 py-2 text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
                             >
                               Post Reply
                             </button>

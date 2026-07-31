@@ -214,7 +214,7 @@ export default function Home() {
                           <div className="flex flex-wrap gap-4 pt-4">
                             <Link 
                               href={`/posts/${post.slug}`}
-                              className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary hover:text-slate-900 dark:hover:bg-primary transition-all rounded-lg h-12 px-8 text-sm font-bold flex items-center gap-2 group cursor-pointer shadow-md"
+                              className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary hover:text-white dark:hover:text-slate-900 transition-all rounded-lg h-12 px-8 text-sm font-bold flex items-center gap-2 group cursor-pointer shadow-md"
                             >
                               Read Journal
                               <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-1 transition-transform" />
@@ -240,7 +240,7 @@ export default function Home() {
                   <div className="flex justify-center items-center gap-6">
                     <button 
                       onClick={handlePrevSlide}
-                      className="size-10 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-primary hover:text-slate-900 dark:hover:bg-primary transition-all flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 active:scale-95"
+                      className="size-10 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-primary hover:text-white dark:hover:text-slate-900 transition-all flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 active:scale-95"
                       aria-label="Previous Slide"
                     >
                       <ChevronLeft className="w-5.5 h-5.5" />
@@ -250,7 +250,7 @@ export default function Home() {
                     </span>
                     <button 
                       onClick={handleNextSlide}
-                      className="size-10 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-primary hover:text-slate-900 dark:hover:bg-primary transition-all flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 active:scale-95"
+                      className="size-10 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-primary hover:text-white dark:hover:text-slate-900 transition-all flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 active:scale-95"
                       aria-label="Next Slide"
                     >
                       <ChevronRight className="w-5.5 h-5.5" />
@@ -397,7 +397,7 @@ export default function Home() {
                     />
                     <button 
                       type="submit"
-                      className="bg-primary hover:bg-primary/90 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all shadow-lg shadow-primary/25 cursor-pointer hover:-translate-y-0.5 duration-200 active:translate-y-0"
+                      className="bg-primary hover:bg-primary/90 text-white dark:text-slate-900 font-bold py-3 px-6 rounded-lg transition-all shadow-lg shadow-primary/25 cursor-pointer hover:-translate-y-0.5 duration-200 active:translate-y-0"
                     >
                       Subscribe
                     </button>

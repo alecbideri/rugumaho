@@ -273,7 +273,7 @@ export default function CategoryPage({ params }: PageProps) {
             href="/category/all"
             className={`px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all border cursor-pointer ${
               rawCategory.toLowerCase() === "all"
-                ? "bg-primary text-slate-900 border-primary shadow-sm"
+                ? "bg-primary text-white dark:text-slate-900 border-primary shadow-sm"
                 : "border-slate-200 text-slate-500 hover:border-primary hover:text-primary bg-white"
             }`}
           >
@@ -292,7 +292,7 @@ export default function CategoryPage({ params }: PageProps) {
                 href={`/category/${cat.path}`}
                 className={`px-6 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all border cursor-pointer ${
                   isActive
-                    ? "bg-primary text-slate-900 border-primary shadow-sm"
+                    ? "bg-primary text-white dark:text-slate-900 border-primary shadow-sm"
                     : "border-slate-200 text-slate-500 hover:border-primary hover:text-primary bg-white"
                 }`}
               >
@@ -343,7 +343,7 @@ export default function CategoryPage({ params }: PageProps) {
               </form>
               <button
                 onClick={handleClearSearch}
-                className="px-5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-primary hover:text-slate-900 transition-all cursor-pointer whitespace-nowrap"
+                className="px-5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-primary hover:text-white dark:hover:text-slate-900 transition-all cursor-pointer whitespace-nowrap"
               >
                 Clear Search
               </button>
@@ -447,7 +447,7 @@ export default function CategoryPage({ params }: PageProps) {
                       onClick={() => setCurrentPage(page)}
                       className={`w-10 h-10 rounded-full font-bold text-sm transition-colors cursor-pointer ${
                         currentPage === page
-                          ? "bg-primary text-slate-900"
+                          ? "bg-primary text-white dark:text-slate-900"
                           : "hover:bg-slate-50 text-slate-500 font-medium"
                       }`}
                     >
@@ -516,7 +516,7 @@ export default function CategoryPage({ params }: PageProps) {
                     />
                     <button 
                       type="submit"
-                      className="w-full bg-primary text-slate-950 text-sm font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors shadow-lg shadow-primary/10 cursor-pointer"
+                      className="w-full bg-primary text-white dark:text-slate-950 text-sm font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors shadow-lg shadow-primary/10 cursor-pointer"
                     >
                       Subscribe
                     </button>

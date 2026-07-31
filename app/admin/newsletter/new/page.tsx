@@ -445,7 +445,7 @@ export default function ComposeNewsletterPage() {
                 <button 
                   type="button"
                   onClick={() => alert("Action: Read the full story button clicked.")}
-                  className="bg-primary text-slate-900 font-bold px-8 py-3 rounded-lg hover:bg-opacity-90 transition-all cursor-pointer"
+                  className="bg-primary text-white dark:text-slate-900 font-bold px-8 py-3 rounded-lg hover:bg-opacity-90 transition-all cursor-pointer"
                 >
                   Read the full story
                 </button>
@@ -490,7 +490,7 @@ export default function ComposeNewsletterPage() {
           </button>
           <button 
             onClick={handleSendNow}
-            className="px-8 py-2.5 rounded-lg bg-primary text-slate-900 font-bold text-sm shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+            className="px-8 py-2.5 rounded-lg bg-primary text-white dark:text-slate-900 font-bold text-sm shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer flex items-center gap-2"
           >
             <Send className="w-4 h-4" />
             Send Now

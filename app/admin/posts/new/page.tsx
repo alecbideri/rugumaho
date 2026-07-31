@@ -621,7 +621,7 @@ function NewPostEditor() {
           <button 
             type="button"
             onClick={() => handleSave("published")}
-            className="px-5 py-2 text-sm font-bold text-white bg-primary hover:bg-primary/90 rounded-lg shadow-sm shadow-primary/20 transition-all cursor-pointer"
+            className="px-5 py-2 text-sm font-bold text-white dark:text-slate-900 bg-primary hover:bg-primary/90 rounded-lg shadow-sm shadow-primary/20 transition-all cursor-pointer"
           >
             Publish
           </button>
