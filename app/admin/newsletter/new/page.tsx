@@ -183,7 +183,7 @@ export default function ComposeNewsletterPage() {
           margin-bottom: 1rem;
         }
         .wysiwyg-newsletter-content blockquote {
-          border-left: 3px solid #2bcdee;
+          border-left: 3px solid var(--color-primary);
           padding-left: 0.75rem;
           font-style: italic;
           color: #64748b;

@@ -201,7 +201,7 @@ export default function AdminNewsletterPage() {
               </div>
               <div className="w-24 h-12">
                 <svg className="w-full h-full" viewBox="0 0 100 40">
-                  <path d="M0 35 Q 20 10, 40 25 T 80 5 T 100 20" fill="none" stroke="#2bcdee" strokeLinecap="round" strokeWidth="3"></path>
+                  <path d="M0 35 Q 20 10, 40 25 T 80 5 T 100 20" fill="none" stroke="var(--color-primary)" strokeLinecap="round" strokeWidth="3"></path>
                 </svg>
               </div>
             </div>

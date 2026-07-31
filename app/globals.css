@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary: #2bcdee;
+  --color-primary: #0f172a;
   --color-background-light: #f6f8f8;
   --color-background-dark: #101f22;
   --color-slate-900: #0f172a;
@@ -12,7 +12,7 @@
   --font-display: var(--font-inter), sans-serif;
   --font-serif: var(--font-playfair), serif;
   
-  --background-image-dot-pattern: radial-gradient(#2bcdee 1px, transparent 1px);
+  --background-image-dot-pattern: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px);
 }
 
 :root {
@@ -23,6 +23,8 @@
 .dark {
   --background: #101f22;
   --foreground: #f8fafc;
+  --color-primary: #f8fafc;
+  --background-image-dot-pattern: radial-gradient(rgba(248, 250, 252, 0.08) 1px, transparent 1px);
 }
 
 body {

@@ -552,7 +552,7 @@ function NewPostEditor() {
           color: var(--foreground);
         }
         .wysiwyg-content blockquote {
-          border-left: 4px solid #2bcdee;
+          border-left: 4px solid var(--color-primary);
           padding-left: 1rem;
           font-style: italic;
           color: #64748b;
@@ -571,7 +571,7 @@ function NewPostEditor() {
           object-fit: cover;
         }
         .wysiwyg-content div[contenteditable="false"] p[contenteditable="true"]:focus {
-          outline: 1px dashed #2bcdee;
+          outline: 1px dashed var(--color-primary);
           border-radius: 4px;
           padding: 2px 6px;
         }
