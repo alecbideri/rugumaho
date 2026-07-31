@@ -529,16 +529,16 @@ export default function CategoryPage({ params }: PageProps) {
                 <h4 className="font-serif text-xl font-bold mb-6 text-slate-900 border-b border-slate-100 pb-3">
                   Catch up with me on socials
                 </h4>
-                <div className="flex gap-6 items-center px-2">
+                <div className="flex gap-4 items-center px-2">
                   {/* Instagram Link */}
                   <a 
                     href="https://instagram.com" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-slate-700 hover:text-primary transition-colors cursor-pointer"
+                    className="size-11 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-700 hover:text-white dark:hover:text-slate-900 hover:bg-slate-900 dark:hover:bg-white hover:border-slate-900 dark:hover:border-white transition-all cursor-pointer hover:scale-110 active:scale-95"
                     aria-label="Instagram"
                   >
-                    <InstagramIcon className="w-6 h-6" />
+                    <InstagramIcon className="w-5 h-5" />
                   </a>
 
                   {/* YouTube Link */}
@@ -546,10 +546,10 @@ export default function CategoryPage({ params }: PageProps) {
                     href="https://youtube.com" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-slate-700 hover:text-primary transition-colors cursor-pointer"
+                    className="size-11 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-700 hover:text-white dark:hover:text-slate-900 hover:bg-slate-900 dark:hover:bg-white hover:border-slate-900 dark:hover:border-white transition-all cursor-pointer hover:scale-110 active:scale-95"
                     aria-label="YouTube"
                   >
-                    <YoutubeIcon className="w-6 h-6" />
+                    <YoutubeIcon className="w-5 h-5" />
                   </a>
                 </div>
               </div>
