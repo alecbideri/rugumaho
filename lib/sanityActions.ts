@@ -202,6 +202,12 @@ export async function addSubscriberServer(subscriber: SubscriberData) {
     };
 
     const created = await sanityWriteClient.create(doc);
+
+    // Fire welcome email notification asynchronously
+    sendWelcomeEmail(subscriber.email, subscriber.name).catch((err) => {
+      console.error("Failed to execute welcome email trigger:", err);
+    });
+
     return {
       success: true,
       id: created._id
@@ -460,7 +466,7 @@ async function sendCommentNotificationEmail(comment: {
             <p style="font-size: 13px; color: #64748b; margin: 0;">A comment is waiting for your approval in the moderation queue.</p>
           </div>
           
-          <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px; border-left: 4px solid #0ea5e9; margin-bottom: 24px;">
+          <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px; border-left: 4px solid #0f172a; margin-bottom: 24px;">
             <p style="margin: 0 0 10px 0; font-size: 13px; color: #475569;">
               <strong>Author:</strong> ${comment.name} (${comment.email})
             </p>
@@ -483,6 +489,50 @@ async function sendCommentNotificationEmail(comment: {
     console.log("Successfully sent comment notification email via Resend.");
   } catch (err) {
     console.error("Failed to send comment notification email via Resend:", err);
+  }
+}
+
+async function sendWelcomeEmail(email: string, name?: string) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.log("RESEND_API_KEY is not defined in env. Skipping welcome email.");
+    return;
+  }
+
+  try {
+    const resend = new Resend(apiKey);
+    await resend.emails.send({
+      from: 'Rugumaho <onboarding@resend.dev>',
+      to: email,
+      subject: 'Welcome to the Inner Circle | Rugumaho',
+      html: `
+        <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 580px; margin: 0 auto; padding: 32px 24px; border: 1px solid #f1f5f9; border-radius: 16px; background-color: #ffffff;">
+          <div style="text-align: center; margin-bottom: 32px; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px;">
+            <h1 style="font-family: Georgia, serif; font-size: 28px; font-weight: bold; color: #0f172a; margin: 0 0 8px 0; letter-spacing: -0.5px;">RUGUMAHO</h1>
+            <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: #64748b; margin: 0; font-weight: 700;">Inner Circle</p>
+          </div>
+          
+          <div style="font-size: 15px; color: #334155; line-height: 1.8; margin-bottom: 32px;">
+            <p>Hello${name ? ` ${name}` : ''},</p>
+            <p>Thank you for subscribing to my personal journal list. I am thrilled to welcome you to this corner of the web.</p>
+            <p>Going forward, you will receive weekly updates containing personal essays, travel notes from quiet corners of the world, and insights into active lifestyle & wellness.</p>
+            <p>I look forward to sharing these stories with you.</p>
+            <p style="margin-top: 24px; border-left: 3px solid #0f172a; padding-left: 12px; font-style: italic; color: #475569;">
+              Warmly,<br/><strong>Ariane Rugumaho</strong>
+            </p>
+          </div>
+          
+          <div style="text-align: center; border-top: 1px solid #f1f5f9; padding-top: 24px; margin-top: 32px;">
+            <a href="https://rugumaho.com" target="_blank" style="background-color: #0f172a; color: #ffffff; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: bold; text-decoration: none; display: inline-block;">
+              Explore the Journal
+            </a>
+          </div>
+        </div>
+      `
+    });
+    console.log(`Successfully sent welcome email to ${email} via Resend.`);
+  } catch (err) {
+    console.error("Failed to send welcome email via Resend:", err);
   }
 }
 
