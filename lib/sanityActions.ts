@@ -455,7 +455,7 @@ async function sendCommentNotificationEmail(comment: {
   try {
     const resend = new Resend(apiKey);
     await resend.emails.send({
-      from: 'Rugumaho Blog Alerts <onboarding@resend.dev>',
+      from: 'Rugumaho Blog Alerts <alerts@rugumaho.com>',
       to: 'arianebloger@gmail.com', // Change this to your preferred admin email
       subject: `New Comment Pending Moderation on "${comment.postSlug}"`,
       html: `
@@ -502,7 +502,7 @@ async function sendWelcomeEmail(email: string, name?: string) {
   try {
     const resend = new Resend(apiKey);
     await resend.emails.send({
-      from: 'Rugumaho <onboarding@resend.dev>',
+      from: 'Ariane Rugumaho <hello@rugumaho.com>',
       to: email,
       subject: 'Welcome to the Inner Circle | Rugumaho',
       html: `
