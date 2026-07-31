@@ -114,10 +114,16 @@ export default function AdminNewsletterPage() {
   );
 
   const activeSubscribersCount = subscribers.filter(s => s.status === "Active").length;
-  // Calculate display count matching the HTML metric
-  const displayTotalSubscribers = 12438 + activeSubscribersCount;
+  const displayTotalSubscribers = activeSubscribersCount;
 
-
+  const getAverageOpenRate = () => {
+    if (campaigns.length === 0) return 0;
+    const total = campaigns.reduce((acc, c) => {
+      const rate = parseFloat(c.openRate.replace("%", "")) || 0;
+      return acc + rate;
+    }, 0);
+    return Math.round(total / campaigns.length);
+  };
 
   const toggleSubscriberStatus = (id: string, currentStatus: "Active" | "Unsubscribed") => {
     toggleSubscriberStatusApi(id, currentStatus).then(() => {
@@ -211,14 +217,14 @@ export default function AdminNewsletterPage() {
           <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
             <div>
               <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Average Open Rate</p>
-              <h3 className="text-3xl font-bold mt-1">68.4%</h3>
+              <h3 className="text-3xl font-bold mt-1">{getAverageOpenRate()}%</h3>
               <div className="flex items-center gap-1 mt-2 text-green-600 dark:text-green-400 text-sm font-semibold">
                 <ArrowUp className="w-4 h-4" />
                 +2.1% improvement
               </div>
             </div>
             <div className="mt-4 h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-              <div className="h-full bg-primary rounded-full" style={{ width: "68.4%" }}></div>
+              <div className="h-full bg-primary rounded-full" style={{ width: `${getAverageOpenRate()}%` }}></div>
             </div>
           </div>
 

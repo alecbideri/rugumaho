@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { addCampaign } from "../../../../lib/mockData";
+import { addCampaign, getSubscribers } from "../../../../lib/mockData";
 import { 
   Bold, 
   Italic, 
@@ -33,6 +33,7 @@ export default function ComposeNewsletterPage() {
   const [activeTab, setActiveTab] = useState<"write" | "templates" | "settings">("write");
   const [savedTime, setSavedTime] = useState("");
   const [showToast, setShowToast] = useState<string | null>(null);
+  const [subscribersCount, setSubscribersCount] = useState(0);
 
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -47,6 +48,11 @@ export default function ComposeNewsletterPage() {
     if (editorRef.current) {
       editorRef.current.innerHTML = initialText;
     }
+
+    getSubscribers().then((data) => {
+      const activeCount = data.filter(s => s.status === "Active").length;
+      setSubscribersCount(activeCount);
+    }).catch(err => console.error("Failed to load subscribers for count:", err));
   }, []);
 
   // Update save timestamp dynamically as they type
@@ -126,7 +132,7 @@ export default function ComposeNewsletterPage() {
     addCampaign({
       title: subject,
       sentDate: currentMonthYear,
-      recipients: 12450,
+      recipients: subscribersCount,
       openRate: "0.0%",
       clickRate: "0.0%"
     }).then(() => {
@@ -155,7 +161,7 @@ export default function ComposeNewsletterPage() {
       {/* Embedded local styles for the email editor content block */}
       <style dangerouslySetInnerHTML={{ __html: `
         .dot-grid {
-          background-image: radial-gradient(circle, rgba(43, 205, 238, 0.22) 1.6px, transparent 1.6px);
+          background-image: radial-gradient(circle, rgba(15, 23, 42, 0.08) 1.6px, transparent 1.6px);
           background-size: 20px 20px;
         }
         .serif-heading {
@@ -377,7 +383,7 @@ export default function ComposeNewsletterPage() {
                 <div className="space-y-2 pt-2">
                   <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Audience Group</p>
                   <select className="w-full bg-transparent border-slate-200 dark:border-slate-800 rounded-lg text-sm p-3 focus:ring-0 dark:text-white">
-                    <option>All Active Subscribers (12,450 recipients)</option>
+                    <option>All Active Subscribers ({subscribersCount} recipients)</option>
                     <option>Weekly Digest Segment (8,410 recipients)</option>
                     <option>VIP Supporters (540 recipients)</option>
                   </select>
