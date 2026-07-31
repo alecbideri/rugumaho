@@ -536,3 +536,51 @@ async function sendWelcomeEmail(email: string, name?: string) {
   }
 }
 
+export async function sendContactFormEmail(data: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.log("RESEND_API_KEY is not defined in env. Skipping contact form email.");
+    return { success: false, error: "Email configuration missing." };
+  }
+
+  try {
+    const resend = new Resend(apiKey);
+    await resend.emails.send({
+      from: 'Rugumaho Contact Form <alerts@rugumaho.com>',
+      to: 'arianebloger@gmail.com',
+      subject: `[Contact Enquiry] ${data.subject} - from ${data.name}`,
+      html: `
+        <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #f1f5f9; border-radius: 16px; background-color: #ffffff;">
+          <div style="margin-bottom: 24px; text-align: center;">
+            <span style="font-size: 24px;">✉️</span>
+            <h2 style="font-family: Georgia, serif; font-size: 22px; color: #0f172a; margin: 12px 0 4px 0;">New Contact Form Submission</h2>
+            <p style="font-size: 13px; color: #64748b; margin: 0;">A user has submitted an enquiry through the website.</p>
+          </div>
+          
+          <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px; border-left: 4px solid #0f172a; margin-bottom: 24px;">
+            <p style="margin: 0 0 10px 0; font-size: 13px; color: #475569;">
+              <strong>Sender:</strong> ${data.name} (${data.email})
+            </p>
+            <p style="margin: 0 0 10px 0; font-size: 13px; color: #475569;">
+              <strong>Subject:</strong> ${data.subject}
+            </p>
+            <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid #e2e8f0; font-size: 14px; color: #334155; line-height: 1.6; white-space: pre-wrap;">
+              ${data.message}
+            </div>
+          </div>
+        </div>
+      `
+    });
+    console.log(`Successfully sent contact form notification for ${data.email} via Resend.`);
+    return { success: true };
+  } catch (err: any) {
+    console.error("Failed to send contact form email:", err);
+    return { success: false, error: err.message || "Failed to deliver message." };
+  }
+}
+

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronDown, Send } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import { sendContactFormEmail } from "../../lib/sanityActions";
 
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg 
@@ -48,15 +49,29 @@ export default function ContactPage() {
   const [subject, setSubject] = useState("General Inquiry");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (name && email && message) {
-      setSubmitted(true);
-      setName("");
-      setEmail("");
-      setMessage("");
-      setTimeout(() => setSubmitted(false), 5000);
+    if (!name.trim() || !email.trim() || !message.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      const res = await sendContactFormEmail({ name, email, subject, message });
+      if (res.success) {
+        setSubmitted(true);
+        setName("");
+        setEmail("");
+        setMessage("");
+        setTimeout(() => setSubmitted(false), 5000);
+      } else {
+        alert("Failed to send message: " + (res.error || "Unknown error"));
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -157,10 +172,11 @@ export default function ContactPage() {
               {/* Send Button */}
               <button
                 type="submit"
-                className="w-full bg-primary text-white dark:text-slate-950 text-sm font-extrabold py-4 rounded-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/15 cursor-pointer flex items-center justify-center gap-2"
+                disabled={isSubmitting}
+                className="w-full bg-primary text-white dark:text-slate-900 disabled:opacity-50 text-sm font-extrabold py-4 rounded-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/15 cursor-pointer flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                Send Message
+                {isSubmitting ? "Sending..." : "Send Message"}
               </button>
 
             </form>
