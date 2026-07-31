@@ -158,7 +158,7 @@ export default function Navbar() {
                             setShowDropdown(false);
                             setSearchQuery("");
                           }}
-                          className="flex items-center gap-3 p-2.5 hover:bg-slate-50 rounded-lg transition-colors group text-left"
+                          className="flex items-center gap-3 p-2.5 hover:bg-slate-900 dark:hover:bg-slate-800 rounded-lg transition-all group text-left"
                         >
                           {post.coverImage && (
                             <img
@@ -168,10 +168,10 @@ export default function Navbar() {
                             />
                           )}
                           <div className="min-w-0 flex-1">
-                            <span className="inline-block text-[9px] font-extrabold uppercase tracking-wider text-primary mb-0.5">
+                            <span className="inline-block text-[9px] font-extrabold uppercase tracking-wider text-primary group-hover:text-white transition-colors mb-0.5">
                               {post.category}
                             </span>
-                            <p className="text-xs font-bold text-slate-900 group-hover:text-primary transition-colors truncate">
+                            <p className="text-xs font-bold text-slate-900 group-hover:text-white transition-colors truncate">
                               {post.title}
                             </p>
                           </div>
@@ -279,7 +279,7 @@ export default function Navbar() {
                           setSearchQuery("");
                           setIsOpen(false);
                         }}
-                        className="flex items-center gap-3 p-2.5 hover:bg-slate-50 rounded-lg transition-colors group text-left"
+                        className="flex items-center gap-3 p-2.5 hover:bg-slate-900 dark:hover:bg-slate-800 rounded-lg transition-all group text-left"
                       >
                         {post.coverImage && (
                           <img
@@ -289,10 +289,10 @@ export default function Navbar() {
                           />
                         )}
                         <div className="min-w-0 flex-1">
-                          <span className="inline-block text-[9px] font-extrabold uppercase tracking-wider text-primary mb-0.5">
+                          <span className="inline-block text-[9px] font-extrabold uppercase tracking-wider text-primary group-hover:text-white transition-colors mb-0.5">
                             {post.category}
                           </span>
-                          <p className="text-xs font-bold text-slate-900 group-hover:text-primary transition-colors truncate">
+                          <p className="text-xs font-bold text-slate-900 group-hover:text-white transition-colors truncate">
                             {post.title}
                           </p>
                         </div>

@@ -177,36 +177,36 @@ export default function ContactPage() {
           </div>
 
           {/* Contact footnotes direct email and socials */}
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-6">
             <div className="space-y-1">
               <p className="text-xs text-slate-500 font-light">Prefer email?</p>
               <a 
                 href="mailto:hello@rugumaho.com" 
-                className="text-primary hover:underline text-lg font-bold transition-all"
+                className="text-primary hover:text-primary/70 inline-block text-lg font-bold transition-all hover:scale-[1.02] active:scale-98 underline decoration-dotted decoration-primary/30 hover:decoration-solid"
               >
                 hello@rugumaho.com
               </a>
             </div>
 
             {/* Flat Outlined Social Row */}
-            <div className="flex gap-6 justify-center items-center pt-2">
+            <div className="flex gap-4 justify-center items-center pt-2">
               <a 
                 href="https://instagram.com" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-slate-700 hover:text-primary transition-colors cursor-pointer" 
+                className="size-11 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-700 hover:text-white dark:hover:text-slate-900 hover:bg-slate-900 dark:hover:bg-white hover:border-slate-900 dark:hover:border-white transition-all cursor-pointer hover:scale-110 active:scale-95" 
                 aria-label="Instagram"
               >
-                <InstagramIcon className="w-6 h-6" />
+                <InstagramIcon className="w-5 h-5" />
               </a>
               <a 
                 href="https://youtube.com" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-slate-700 hover:text-primary transition-colors cursor-pointer" 
+                className="size-11 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-700 hover:text-white dark:hover:text-slate-900 hover:bg-slate-900 dark:hover:bg-white hover:border-slate-900 dark:hover:border-white transition-all cursor-pointer hover:scale-110 active:scale-95" 
                 aria-label="YouTube"
               >
-                <YoutubeIcon className="w-6 h-6" />
+                <YoutubeIcon className="w-5 h-5" />
               </a>
             </div>
           </div>
