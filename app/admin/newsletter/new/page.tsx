@@ -286,7 +286,16 @@ export default function ComposeNewsletterPage() {
   };
 
   const handleCodeButton = () => {
-    formatText("insertHTML", `<code class="bg-slate-100 dark:bg-slate-800 p-1 rounded font-mono text-sm">code</code>`);
+    const savedSel = saveCurrentSelection();
+    const selectedText = savedSel ? savedSel.toString().trim() : "";
+    restoreCurrentSelection(savedSel);
+    if (selectedText) {
+      const codeHTML = `<code class="bg-slate-100 dark:bg-slate-800 p-1 rounded font-mono text-sm text-slate-800 dark:text-slate-200 font-semibold">${selectedText}</code>`;
+      formatText("insertHTML", codeHTML);
+    } else {
+      const codeHTML = `<code class="bg-slate-100 dark:bg-slate-800 p-1 rounded font-mono text-sm text-slate-800 dark:text-slate-200 font-semibold">code</code>`;
+      formatText("insertHTML", codeHTML);
+    }
   };
 
   const handleEditorInput = () => {
@@ -442,9 +451,13 @@ export default function ComposeNewsletterPage() {
           object-fit: cover;
         }
         .wysiwyg-newsletter-content ul {
-          list-style-type: disc;
-          padding-left: 1.25rem;
+          list-style-type: disc !important;
+          padding-left: 1.75rem !important;
           margin-bottom: 1rem;
+        }
+        .wysiwyg-newsletter-content li {
+          list-style-type: disc !important;
+          margin-bottom: 0.5rem;
         }
         .wysiwyg-newsletter-content blockquote {
           border-left: 3px solid var(--color-primary);
@@ -596,7 +609,7 @@ export default function ComposeNewsletterPage() {
                   {/* Content editable body */}
                   <div 
                     ref={editorRef}
-                    className="flex-1 p-6 border-none text-slate-800 dark:text-slate-200 text-lg leading-relaxed placeholder:text-slate-300 min-h-[350px] focus:outline-none overflow-y-auto" 
+                    className="wysiwyg-newsletter-content flex-1 p-6 border-none text-slate-800 dark:text-slate-200 text-lg leading-relaxed placeholder:text-slate-300 min-h-[350px] focus:outline-none overflow-y-auto" 
                     contentEditable="true"
                     onInput={handleEditorInput}
                   />
