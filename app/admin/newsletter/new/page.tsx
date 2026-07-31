@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { addCampaign, getSubscribers } from "../../../../lib/mockData";
+import { addCampaign, getSubscribers, getCampaigns } from "../../../../lib/mockData";
 import { 
   Bold, 
   Italic, 
@@ -20,8 +20,12 @@ import {
   X,
   FileText,
   Flower,
-  Mail
+  Mail,
+  ArrowLeft,
+  ArrowRight,
+  Quote
 } from "lucide-react";
+import { uploadImageToImageKit } from "../../../../lib/imagekitActions";
 
 export default function ComposeNewsletterPage() {
   const router = useRouter();
@@ -37,6 +41,56 @@ export default function ComposeNewsletterPage() {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [scheduleDate, setScheduleDate] = useState("");
   const [scheduleTime, setScheduleTime] = useState("");
+  const [issueNumber, setIssueNumber] = useState("1");
+  const [uploadSelectionRef, setUploadSelectionRef] = useState<Range | null>(null);
+
+  const featuredFileInputRef = useRef<HTMLInputElement>(null);
+  const inlineFileInputRef = useRef<HTMLInputElement>(null);
+
+  const [linkModal, setLinkModal] = useState<{
+    isOpen: boolean;
+    text: string;
+    url: string;
+    savedSelection: Range | null;
+  }>({
+    isOpen: false,
+    text: "",
+    url: "",
+    savedSelection: null
+  });
+
+  const [mediaModal, setMediaModal] = useState<{
+    isOpen: boolean;
+    type: "image" | "video";
+    url: string;
+    caption: string;
+    savedSelection: Range | null;
+  }>({
+    isOpen: false,
+    type: "image",
+    url: "",
+    caption: "",
+    savedSelection: null
+  });
+
+  const [modal, setModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'confirm' | 'prompt' | 'choice';
+    placeholder?: string;
+    inputValue?: string;
+    confirmText?: string;
+    cancelText?: string;
+    choiceOptions?: { label: string; action: () => void }[];
+    onConfirm: (val?: string) => void;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "confirm",
+    onConfirm: () => {}
+  });
 
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -56,6 +110,10 @@ export default function ComposeNewsletterPage() {
       const activeCount = data.filter(s => s.status === "Active").length;
       setSubscribersCount(activeCount);
     }).catch(err => console.error("Failed to load subscribers for count:", err));
+
+    getCampaigns().then((data) => {
+      setIssueNumber((data.length + 1).toString());
+    }).catch(err => console.error("Failed to load campaigns for issue count:", err));
   }, []);
 
   // Update save timestamp dynamically as they type
@@ -78,18 +136,153 @@ export default function ComposeNewsletterPage() {
     }
   };
 
-  const handleLinkButton = () => {
-    const url = prompt("Enter link URL:");
-    if (url) {
-      formatText("createLink", url);
+  const showChoiceModal = (title: string, message: string, choices: { label: string; action: () => void }[]) => {
+    setModal({
+      isOpen: true,
+      title,
+      message,
+      type: 'choice',
+      choiceOptions: choices,
+      onConfirm: () => {}
+    });
+  };
+
+  const showPromptModal = (title: string, message: string, defaultValue: string, placeholder: string, onConfirm: (val: string) => void) => {
+    setModal({
+      isOpen: true,
+      title,
+      message,
+      type: 'prompt',
+      inputValue: defaultValue,
+      placeholder,
+      confirmText: 'Insert',
+      cancelText: 'Cancel',
+      onConfirm: (val) => {
+        onConfirm(val || "");
+        setModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
+
+  const saveCurrentSelection = () => {
+    if (typeof window === "undefined") return null;
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      return sel.getRangeAt(0);
+    }
+    return null;
+  };
+
+  const restoreCurrentSelection = (range: Range | null) => {
+    if (typeof window === "undefined" || !range) return;
+    const sel = window.getSelection();
+    if (sel) {
+      sel.removeAllRanges();
+      sel.addRange(range);
     }
   };
 
+  const handleLinkButton = () => {
+    const savedSel = saveCurrentSelection();
+    const selectedText = savedSel ? savedSel.toString().trim() : "";
+    setLinkModal({
+      isOpen: true,
+      text: selectedText,
+      url: "",
+      savedSelection: savedSel
+    });
+  };
+
+  const handleInsertLink = () => {
+    if (!linkModal.url.trim()) return;
+
+    restoreCurrentSelection(linkModal.savedSelection);
+    const linkText = linkModal.text.trim() || linkModal.url.trim();
+    const linkHTML = `<a href="${linkModal.url.trim()}" target="_blank" class="text-primary hover:underline font-semibold transition-all duration-150">${linkText}</a>`;
+    
+    formatText("insertHTML", linkHTML);
+    setLinkModal({ isOpen: false, text: "", url: "", savedSelection: null });
+  };
+
   const handleImageButton = () => {
-    const url = prompt("Enter image URL to insert in body:");
-    if (url) {
-      formatText("insertImage", url);
+    const savedSel = saveCurrentSelection();
+    showChoiceModal(
+      "Insert Image",
+      "Choose how you want to add an image to your newsletter:",
+      [
+        {
+          label: "Upload from computer",
+          action: () => {
+            setUploadSelectionRef(savedSel);
+            setTimeout(() => inlineFileInputRef.current?.click(), 100);
+          }
+        },
+        {
+          label: "Insert image web link (URL)",
+          action: () => {
+            setTimeout(() => {
+              setMediaModal({
+                isOpen: true,
+                type: "image",
+                url: "",
+                caption: "",
+                savedSelection: savedSel
+              });
+            }, 300);
+          }
+        }
+      ]
+    );
+  };
+
+  const handleInsertMedia = () => {
+    if (!mediaModal.url.trim()) return;
+
+    restoreCurrentSelection(mediaModal.savedSelection);
+    const captionText = mediaModal.caption.trim() || `Write image caption...`;
+
+    const imgHTML = `
+      <div class="my-6 text-center select-none" contenteditable="false">
+        <img src="${mediaModal.url.trim()}" class="rounded-xl max-h-[450px] object-cover w-full shadow-md animate-fade-in" alt="Newsletter image" />
+        <p class="text-xs text-slate-450 dark:text-slate-500 mt-2 font-serif italic border-none focus:outline-none" contenteditable="true">${captionText}</p>
+      </div>
+      <p><br></p>
+    `;
+    formatText("insertHTML", imgHTML);
+    setMediaModal({ isOpen: false, type: "image", url: "", caption: "", savedSelection: null });
+  };
+
+  const handleInlineFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    triggerToast("Uploading image to ImageKit...");
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64 = reader.result as string;
+        const res = await uploadImageToImageKit(base64, file.name);
+        if (res.success && res.url) {
+          restoreCurrentSelection(uploadSelectionRef);
+          const imgHTML = `
+            <div class="my-6 text-center select-none" contenteditable="false">
+              <img src="${res.url}" class="rounded-xl max-h-[450px] object-cover w-full shadow-md animate-fade-in" alt="Newsletter image" />
+              <p class="text-xs text-slate-450 dark:text-slate-500 mt-2 font-serif italic border-none focus:outline-none" contenteditable="true">Write image caption...</p>
+            </div>
+            <p><br></p>
+          `;
+          formatText("insertHTML", imgHTML);
+          triggerToast("Image inserted successfully!");
+        } else {
+          alert("ImageKit upload failed: " + (res.error || "Unknown error"));
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (err: any) {
+      console.error(err);
+      alert("Failed to read file: " + err.message);
     }
+    e.target.value = "";
   };
 
   const handleCodeButton = () => {
@@ -103,10 +296,57 @@ export default function ComposeNewsletterPage() {
   };
 
   const handleEditHeroImage = () => {
-    const url = prompt("Enter hero image URL for the email header:", heroImage);
-    if (url) {
-      setHeroImage(url);
+    showChoiceModal(
+      "Set Cover Image",
+      "Choose how you want to set your newsletter cover image:",
+      [
+        {
+          label: "Upload from computer",
+          action: () => featuredFileInputRef.current?.click()
+        },
+        {
+          label: "Insert image web link (URL)",
+          action: () => {
+            setTimeout(() => {
+              showPromptModal(
+                "Cover Image URL",
+                "Enter the direct web address of your featured cover image:",
+                heroImage,
+                "https://example.com/banner.jpg",
+                (url) => {
+                  if (url) setHeroImage(url);
+                }
+              );
+            }, 300);
+          }
+        }
+      ]
+    );
+  };
+
+  const handleFeaturedFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    triggerToast("Uploading cover image to ImageKit...");
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64 = reader.result as string;
+        const res = await uploadImageToImageKit(base64, file.name);
+        if (res.success && res.url) {
+          setHeroImage(res.url);
+          triggerToast("Cover image set successfully!");
+        } else {
+          alert("ImageKit upload failed: " + (res.error || "Unknown error"));
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (err: any) {
+      console.error(err);
+      alert("Failed to read file: " + err.message);
     }
+    e.target.value = "";
   };
 
   const handleSaveDraft = () => {
@@ -217,19 +457,24 @@ export default function ComposeNewsletterPage() {
 
       {/* Navigation Bar */}
       <header className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-6 py-3 bg-white dark:bg-slate-900 shrink-0">
-        <div className="flex items-center gap-3">
-          <Link href="/admin/newsletter" className="text-primary hover:opacity-85 transition-opacity flex items-center">
-            <Flower className="w-8 h-8" />
-          </Link>
-          <h2 className="text-xl font-bold tracking-tight">Rugumaho</h2>
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
+            <Link 
+              href="/admin/newsletter" 
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors flex items-center justify-center p-1 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg"
+              title="Back to Newsletter Dashboard"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+            <div className="flex items-center gap-2">
+              <Flower className="text-primary w-8 h-8 shrink-0 animate-spin-slow" />
+              <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                Rugumaho <span className="font-normal text-slate-500">Studio</span>
+              </h1>
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-6">
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-400">
-            <Link className="hover:text-primary transition-colors" href="/admin/dashboard">Dashboard</Link>
-            <Link className="hover:text-primary transition-colors" href="/admin/newsletter">Audience</Link>
-            <Link className="text-primary" href="#">Analytics</Link>
-          </nav>
-          <div className="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
           <button 
             onClick={handleSaveDraft}
             className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer"
@@ -406,6 +651,15 @@ export default function ComposeNewsletterPage() {
                     <option>VIP Supporters (540 recipients)</option>
                   </select>
                 </div>
+                <div className="space-y-2 pt-2">
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 block">Issue Number</label>
+                  <input 
+                    className="w-full rounded-lg border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-0 text-slate-900 dark:text-white bg-transparent py-2.5 px-3.5 text-sm outline-none" 
+                    type="number"
+                    value={issueNumber}
+                    onChange={(e) => setIssueNumber(e.target.value)}
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -425,7 +679,7 @@ export default function ComposeNewsletterPage() {
                 {subject || "The Weekly Muse"}
               </h1>
               <p className="text-slate-400 text-xs tracking-[0.2em] uppercase mt-2">
-                Issue #42 • {currentMonthYear}
+                Issue #{issueNumber} • {currentMonthYear}
               </p>
             </div>
             
@@ -574,6 +828,199 @@ export default function ComposeNewsletterPage() {
                 className="px-6 py-2 bg-primary text-white dark:text-slate-900 font-bold text-sm rounded-lg hover:bg-opacity-95 disabled:opacity-50 transition-all cursor-pointer"
               >
                 Confirm Schedule
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden file inputs for image uploads */}
+      <input 
+        type="file" 
+        ref={featuredFileInputRef} 
+        onChange={handleFeaturedFileChange} 
+        accept="image/*" 
+        className="hidden" 
+      />
+      <input 
+        type="file" 
+        ref={inlineFileInputRef} 
+        onChange={handleInlineFileChange} 
+        accept="image/*" 
+        className="hidden" 
+      />
+
+      {/* General custom dialog Modal */}
+      {modal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in text-left">
+          <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-6 animate-scale-in">
+            <div className="space-y-2">
+              <h3 className="text-lg font-serif font-bold text-slate-900 dark:text-white">
+                {modal.title}
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                {modal.message}
+              </p>
+            </div>
+
+            {/* Input field for Prompts */}
+            {modal.type === 'prompt' && (
+              <input
+                type="text"
+                value={modal.inputValue || ""}
+                onChange={(e) => setModal(prev => ({ ...prev, inputValue: e.target.value }))}
+                placeholder={modal.placeholder}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none text-slate-900 dark:text-white font-medium"
+                autoFocus
+              />
+            )}
+
+            {/* Choice buttons */}
+            {modal.type === 'choice' && modal.choiceOptions && (
+              <div className="flex flex-col gap-3">
+                {modal.choiceOptions.map((opt, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      opt.action();
+                      setModal(prev => ({ ...prev, isOpen: false }));
+                    }}
+                    className="w-full bg-slate-50 dark:bg-slate-800 hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-left text-sm font-semibold transition-all cursor-pointer flex items-center justify-between group text-slate-700 dark:text-slate-300"
+                  >
+                    <span>{opt.label}</span>
+                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setModal(prev => ({ ...prev, isOpen: false }))}
+                  className="w-full text-center text-xs font-bold text-slate-400 hover:text-slate-600 pt-2 cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+
+            {/* Actions for Prompt */}
+            {modal.type !== 'choice' && (
+              <div className="flex justify-end gap-3 border-t border-slate-50 dark:border-slate-800 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setModal(prev => ({ ...prev, isOpen: false }))}
+                  className="px-4 py-2 text-sm font-bold text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                >
+                  {modal.cancelText || 'Cancel'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => modal.onConfirm(modal.inputValue)}
+                  className="px-5 py-2 text-sm font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary dark:hover:bg-primary dark:hover:text-slate-900 rounded-lg transition-all cursor-pointer"
+                >
+                  {modal.confirmText || 'Confirm'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Custom Link Modal */}
+      {linkModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in text-left">
+          <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 animate-scale-in">
+            <h3 className="text-lg font-serif font-bold text-slate-900 dark:text-white">Insert Web Link</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Text to display</label>
+                <input 
+                  type="text" 
+                  value={linkModal.text}
+                  onChange={(e) => setLinkModal(prev => ({ ...prev, text: e.target.value }))}
+                  placeholder="Link text..."
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none text-slate-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">URL (Web address)</label>
+                <input 
+                  type="text" 
+                  value={linkModal.url}
+                  onChange={(e) => setLinkModal(prev => ({ ...prev, url: e.target.value }))}
+                  placeholder="https://example.com"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none text-slate-900 dark:text-white"
+                  autoFocus
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 pt-2 border-t border-slate-50 dark:border-slate-800">
+              <button 
+                type="button"
+                onClick={() => setLinkModal(prev => ({ ...prev, isOpen: false }))}
+                className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-650"
+              >
+                Cancel
+              </button>
+              <button 
+                type="button"
+                onClick={handleInsertLink}
+                disabled={!linkModal.url.trim()}
+                className="px-5 py-2 text-sm font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg disabled:opacity-40"
+              >
+                Insert Link
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Media (Image/Video) Modal */}
+      {mediaModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in text-left">
+          <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 animate-scale-in">
+            <h3 className="text-lg font-serif font-bold text-slate-900 dark:text-white capitalize">
+              Insert {mediaModal.type} URL
+            </h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">
+                  Direct Image URL
+                </label>
+                <input 
+                  type="text" 
+                  value={mediaModal.url}
+                  onChange={(e) => setMediaModal(prev => ({ ...prev, url: e.target.value }))}
+                  placeholder="https://example.com/photo.jpg"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none text-slate-900 dark:text-white"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Caption</label>
+                <input 
+                  type="text" 
+                  value={mediaModal.caption}
+                  onChange={(e) => setMediaModal(prev => ({ ...prev, caption: e.target.value }))}
+                  placeholder="Write a descriptive caption..."
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none text-slate-900 dark:text-white"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 pt-2 border-t border-slate-50 dark:border-slate-800">
+              <button 
+                type="button"
+                onClick={() => setMediaModal(prev => ({ ...prev, isOpen: false }))}
+                className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-650"
+              >
+                Cancel
+              </button>
+              <button 
+                type="button"
+                onClick={handleInsertMedia}
+                disabled={!mediaModal.url.trim()}
+                className="px-5 py-2 text-sm font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg disabled:opacity-40"
+              >
+                Insert Media
               </button>
             </div>
           </div>
