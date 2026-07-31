@@ -192,7 +192,7 @@ export default function Home() {
                           ></div>
                           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60"></div>
                           <div className="absolute bottom-6 left-6 text-white flex items-center gap-2">
-                            <Camera className="w-5 h-5 text-primary" />
+                            <Camera className="w-5 h-5" />
                             <span className="text-sm font-semibold">{post.category || "Featured Journal"}</span>
                           </div>
                         </Link>
