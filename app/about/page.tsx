@@ -51,8 +51,8 @@ export default function AboutPage() {
 
         {/* Mission Quote Card */}
         <section className="max-w-3xl mx-auto w-full px-2">
-          <div className="bg-[#F0FBFF]/70 backdrop-blur-md border border-primary/20 rounded-xl p-8 md:p-12 text-center relative shadow-sm shadow-primary/5">
-            <span className="text-primary text-6xl font-serif leading-none mb-4 block select-none">&ldquo;</span>
+          <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-8 md:p-12 text-center relative shadow-sm">
+            <span className="text-slate-350 text-6xl font-serif leading-none mb-4 block select-none">&ldquo;</span>
             <blockquote className="font-serif text-2xl sm:text-3xl italic text-slate-800 leading-relaxed max-w-2xl mx-auto">
               To inspire meaningful lives through the power of authentic storytelling and community-driven inspiration, fostering a global culture of intentionality.
             </blockquote>
