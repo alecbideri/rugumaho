@@ -404,7 +404,7 @@ export default function Home() {
                   </form>
                 )}
                 
-                <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">Join 15,000+ readers. Unsubscribe anytime.</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">Join others. Unsubscribe anytime.</p>
               </div>
             </section>
 
