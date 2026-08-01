@@ -11,7 +11,7 @@ export default function Logo({ className = "h-10 w-auto", animate = false }: Log
   return (
     <svg 
       xmlns="http://www.w3.org/2000/svg" 
-      viewBox="0 0 1024 1024" 
+      viewBox="80 440 875 195" 
       className={`${className} text-slate-900 dark:text-white`}
     >
       <defs>

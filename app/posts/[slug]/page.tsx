@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
+import Logo from "../../../components/Logo";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -199,8 +200,11 @@ export default function BlogPostPage({ params }: PageProps) {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-[#f6f8f8] flex items-center justify-center">
-        <div className="text-slate-400 font-medium">Loading article...</div>
+      <div className="min-h-screen bg-[#f6f8f8] dark:bg-slate-950 flex flex-col items-center justify-center gap-4 transition-colors duration-200">
+        <Logo className="h-16 w-auto" animate={true} />
+        <p className="text-slate-450 dark:text-slate-500 text-xs font-bold uppercase tracking-[0.2em] animate-pulse">
+          Loading article...
+        </p>
       </div>
     );
   }
