@@ -549,7 +549,7 @@ export default function ComposeNewsletterPage() {
             <img 
               alt="User profile" 
               className="w-full h-full object-cover"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAot0CfIGSP0ePMPx8RhsKrHib5Ilicb7ExC-mnkh9SeEky65sqhFLJw2BsSftAarX5sCXmNlRwApy3IIqmqvFiik_riZHC94s-Q7A7yhE2n0DwEEfIxcz5WdERXtI1Cxr9aNvx8sr3dq4NOo7rKiJ8TjndYuHFTtEx3jmSBRuajEpaBewgoVPwGKDomlJegbsdvg9sGbGDZrsIej_0M-tCZUjp302UFWtJXwt-2TVPGJhXxfROU9qQiBvoCCNaiLHDNUxx8qO0-l0"
+              src="/profile.png"
             />
           </div>
         </div>
@@ -848,12 +848,24 @@ export default function ComposeNewsletterPage() {
               )}
             </div>
             
-            {/* Email Footer */}
             <div className="p-10 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-100 dark:border-slate-800 text-center space-y-4">
               <div className="flex justify-center gap-6 text-slate-400">
-                <Share2 className="w-5 h-5 cursor-pointer hover:text-primary transition-colors" />
-                <Globe className="w-5 h-5 cursor-pointer hover:text-primary transition-colors" />
-                <Heart className="w-5 h-5 cursor-pointer hover:text-primary transition-colors" />
+                <a 
+                  href="mailto:?subject=Read%20the%20Rugumaho%20Journal&body=Read%20the%20latest%20issue%20of%20the%20newsletter%20here:%20https://rugumaho.com" 
+                  title="Share by Email" 
+                  className="hover:text-primary transition-colors"
+                >
+                  <Share2 className="w-5 h-5" />
+                </a>
+                <a 
+                  href="https://rugumaho.com" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  title="Visit Website" 
+                  className="hover:text-primary transition-colors"
+                >
+                  <Globe className="w-5 h-5" />
+                </a>
               </div>
               <p className="text-slate-400 text-xs">
                 You're receiving this because you're part of Rugumaho.<br/>

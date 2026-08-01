@@ -123,7 +123,7 @@ export default function AdminLayout({
             <img 
               className="w-10 h-10 rounded-full object-cover border border-slate-200" 
               alt="User avatar of Ariane" 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAot0CfIGSP0ePMPx8RhsKrHib5Ilicb7ExC-mnkh9SeEky65sqhFLJw2BsSftAarX5sCXmNlRwApy3IIqmqvFiik_riZHC94s-Q7A7yhE2n0DwEEfIxcz5WdERXtI1Cxr9aNvx8sr3dq4NOo7rKiJ8TjndYuHFTtEx3jmSBRuajEpaBewgoVPwGKDomlJegbsdvg9sGbGDZrsIej_0M-tCZUjp302UFWtJXwt-2TVPGJhXxfROU9qQiBvoCCNaiLHDNUxx8qO0-l0"
+              src="/profile.png"
             />
             <div className="flex flex-col overflow-hidden">
               <p className="text-sm font-semibold text-slate-800 truncate">Ariane</p>

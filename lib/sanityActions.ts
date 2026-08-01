@@ -638,10 +638,15 @@ export async function sendNewsletterTestEmailServer(data: {
           
           <!-- Email Footer -->
           <div style="padding: 40px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; text-align: center;">
+            <div style="margin-bottom: 20px;">
+              <a href="mailto:?subject=Read%20the%20Rugumaho%20Journal&body=Read%20the%20latest%20issue%20of%20the%20newsletter%20here:%20https://rugumaho.com" style="color: #64748b; text-decoration: none; margin: 0 12px; font-size: 13px; font-weight: 600; display: inline-block;">Share via Email</a>
+              <span style="color: #cbd5e1;">&bull;</span>
+              <a href="https://rugumaho.com" style="color: #64748b; text-decoration: none; margin: 0 12px; font-size: 13px; font-weight: 600; display: inline-block;">Visit Website</a>
+            </div>
             <p style="font-size: 12px; color: #64748b; margin: 0 0 16px 0; line-height: 1.5;">
               You're receiving this because you're part of the Rugumaho community.
             </p>
-            <a href="#" style="font-size: 12px; color: #0f172a; font-weight: bold; text-decoration: underline;">Unsubscribe</a>
+            <a href="https://rugumaho.com" style="font-size: 12px; color: #0f172a; font-weight: bold; text-decoration: underline;">Unsubscribe</a>
           </div>
         </div>
       `
@@ -716,10 +721,15 @@ export async function sendCampaignEmailServer(data: {
             
             <!-- Email Footer -->
             <div style="padding: 40px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; text-align: center;">
+              <div style="margin-bottom: 20px;">
+                <a href="mailto:?subject=Read%20the%20Rugumaho%20Journal&body=Read%20the%20latest%20issue%20of%20the%20newsletter%20here:%20https://rugumaho.com" style="color: #64748b; text-decoration: none; margin: 0 12px; font-size: 13px; font-weight: 600; display: inline-block;">Share via Email</a>
+                <span style="color: #cbd5e1;">&bull;</span>
+                <a href="https://rugumaho.com" style="color: #64748b; text-decoration: none; margin: 0 12px; font-size: 13px; font-weight: 600; display: inline-block;">Visit Website</a>
+              </div>
               <p style="font-size: 12px; color: #64748b; margin: 0 0 16px 0; line-height: 1.5;">
                 You're receiving this because you're part of the Rugumaho community.
               </p>
-              <a href="#" style="font-size: 12px; color: #0f172a; font-weight: bold; text-decoration: underline;">Unsubscribe</a>
+              <a href="https://rugumaho.com" style="font-size: 12px; color: #0f172a; font-weight: bold; text-decoration: underline;">Unsubscribe</a>
             </div>
           </div>
         `
