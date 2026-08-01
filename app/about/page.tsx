@@ -18,9 +18,9 @@ export default function AboutPage() {
           <div className="relative aspect-[3/4] max-w-md mx-auto w-full overflow-hidden rounded-xl shadow-2xl border border-slate-100 bg-white">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/new profile.png"
+              src="/new profile_1.png"
               alt="Ariane Rugumaho portrait"
-              className="w-full h-full object-cover transition-transform duration-700 hover:scale-102"
+              className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-102"
             />
           </div>
 
