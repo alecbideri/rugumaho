@@ -47,7 +47,7 @@ const DEFAULT_COMMENTS: Comment[] = [
       {
         id: "c1-r1",
         author: "Ariane Rugumaho",
-        avatar: "/profile.jpg",
+        avatar: "/profile.png",
         content: "So glad it resonated with you, David! The Northern Province truly is something special.",
         time: "1 day ago",
         likes: 5
@@ -228,7 +228,7 @@ export default function BlogPostPage({ params }: PageProps) {
 
   const authorInfo = post.author === "Ariane Rugumaho" ? {
     name: "Ariane Rugumaho",
-    avatar: "/profile.jpg",
+    avatar: "/profile.png",
     bio: "Ariane is a Kigali-based travel writer and photographer dedicated to uncovering the soulful narratives of African heritage and landscape.",
     handle: "@arianerugumaho"
   } : {
@@ -469,7 +469,7 @@ export default function BlogPostPage({ params }: PageProps) {
           )}
 
           {/* Author Bio Card */}
-          <section className="mt-20 flex flex-col items-center rounded-xl bg-[#F0FBFF]/70 backdrop-blur-md border border-primary/20 shadow-sm shadow-primary/5 p-8 text-center sm:flex-row sm:text-left">
+          <section className="mt-20 flex flex-col items-center rounded-xl bg-slate-50 border border-slate-200/60 shadow-sm p-8 text-center sm:flex-row sm:text-left">
             <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-full border-4 border-white shadow-md">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img 
