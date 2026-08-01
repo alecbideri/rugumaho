@@ -73,7 +73,7 @@ export default function Footer() {
               </p>
               <h4 className="font-serif font-bold text-slate-900 dark:text-white text-base mt-4">4. Your Data Rights</h4>
               <p>
-                You have the right to request the deletion of your comment history or opt out of our email subscription list at any time using the "Unsubscribe" links provided in our campaigns or by contacting us at <a href="mailto:arianebloger@gmail.com" className="text-primary hover:underline font-semibold">arianebloger@gmail.com</a>.
+                You have the right to request the deletion of your comment history or opt out of our email subscription list at any time using the "Unsubscribe" links provided in our campaigns or by contacting us at <a href="mailto:help@rugumaho.com" className="text-primary hover:underline font-semibold">help@rugumaho.com</a>.
               </p>
             </div>
           </div>
