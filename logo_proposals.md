@@ -1,49 +1,24 @@
-# RUGUMAHO Brand Logo Proposals
+# Brand Logo Proposals - Set 2 (Pen Concepts)
 
-Here is the conceptual presentation of logo directions for the **RUGUMAHO** brand, focusing on variations of the silhouette of the African continent merged with the letter **'R'**.
-
----
-
-## Brand Logo Concepts
-
-### Concept 1: The Modern Monogram (Updated)
-This concept merges the geographical silhouette of the African continent with a clean, structured letter **'R'** (designed without any qualitative "premium" or "luxury" styling tags).
-
-![Modern African Monogram](./public/logos/concept_1.png)
-
-#### 🎬 Loading Animation Idea:
-* A single line draws the outline of the African continent. Once complete, a vertical bar sweeps through, dynamically sketching out the letter **'R'** within the boundaries.
+Here are the three premium logo proposals for **RUGUMAHO** incorporating the pen motif, with no African geographic narratives.
 
 ---
 
-### Concept 1B: Thin Line Geometry
-An ultra-clean, minimalist outline version where the contour of Africa and the letter **'R'** are drawn in a single continuous line style.
+## Proposal 1: The Monogram Nib
+A premium typographic monogram combining a modern fountain pen nib with the letter **R**. Designed with clean vectors for an elegant, minimal corporate look.
 
-![Thin Line Geometry](./public/logos/concept_1b.png)
-
-#### 🎬 Loading Animation Idea:
-* A single path animation draws the entire monogram in one fluid stroke (from the top of the 'R', tracing around the continent shape, and resolving at the leg of the 'R').
+![Proposal 1: Monogram Nib](file:///C:/Users/BIDERI%20ALEC/.gemini/antigravity-ide/brain/b4d91c5f-d5d7-47f2-92d4-3c40295675b2/rugumaho_logo_nib_monogram_1785580664670.png)
 
 ---
 
-### Concept 1C: Solid Negative Space
-A bold graphic mark featuring a solid silhouette of the African continent, with the letter **'R'** carved out of the center using negative space. This is highly recognizable at very small scales (like app favicons).
+## Proposal 2: The Line Art Pen
+A flowing single-line illustration of a classic fountain pen nib drawing a sleek line. Symbolizes storytelling, active journaling, and sophisticated curation.
 
-![Solid Negative Space](./public/logos/concept_1c.png)
-
-#### 🎬 Loading Animation Idea:
-* The solid shape of Africa fades in while a glowing light mask sweeps from left to right, revealing the cut-out shape of the letter **'R'** in the center.
+![Proposal 2: Line Art Pen](file:///C:/Users/BIDERI%20ALEC/.gemini/antigravity-ide/brain/b4d91c5f-d5d7-47f2-92d4-3c40295675b2/rugumaho_logo_line_art_pen_1785580693136.png)
 
 ---
 
-## Professional Services & Vector Design Tools
+## Proposal 3: Typographic Wordmark with Pen Detail
+A modern serif wordmark styling of the brand name **RUGUMAHO** featuring a subtle fountain pen nib integrated into the typography itself. Clean, sophisticated, and memorable.
 
-To finalize these concepts or export them as clean vector files:
-
-### 1. Vector Design Tools
-* **Figma**: Open-source vector drawing tool. You can trace these mockups to export them as inline `.svg` code for our website components.
-* **Adobe Illustrator**: The standard editor for scalable vector formats (`.ai`, `.eps`, `.svg`) for physical printing.
-
-### 2. Brand Finalization Platforms
-* **99designs**: Run a contest where designers vector-refine your chosen concept.
-* **Fiverr Pro / Upwork**: Vetted designers who can take these images and deliver finalized SVG and source vector files.
+![Proposal 3: Typographic Wordmark](file:///C:/Users/BIDERI%20ALEC/.gemini/antigravity-ide/brain/b4d91c5f-d5d7-47f2-92d4-3c40295675b2/rugumaho_logo_wordmark_nib_1785580715175.png)
