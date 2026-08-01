@@ -584,3 +584,153 @@ export async function sendContactFormEmail(data: {
   }
 }
 
+export async function sendNewsletterTestEmailServer(data: {
+  subject: string;
+  content: string;
+  heroImage?: string;
+  issueNumber: string;
+  showCtaButton: boolean;
+  ctaButtonText: string;
+  ctaPostLink: string;
+}) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.log("RESEND_API_KEY is not defined in env. Skipping test newsletter email.");
+    return { success: false, error: "Email configuration missing." };
+  }
+
+  try {
+    const resend = new Resend(apiKey);
+    const currentMonthYear = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    
+    await resend.emails.send({
+      from: 'Ariane Rugumaho <hello@rugumaho.com>',
+      to: 'arianebloger@gmail.com',
+      subject: `[TEST] ${data.subject || "The Weekly Muse"}`,
+      html: `
+        <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #f1f5f9; border-radius: 16px; background-color: #ffffff; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
+          <div style="background-color: #0f172a; height: 6px; width: 100%;"></div>
+          
+          <!-- Email Header -->
+          <div style="padding: 45px 40px; border-bottom: 1px solid #f8fafc; text-align: center;">
+            <div style="font-family: Georgia, serif; font-size: 26px; font-weight: bold; color: #0f172a; margin-bottom: 24px; letter-spacing: 2px;">RUGUMAHO</div>
+            <h1 style="font-family: Georgia, serif; font-size: 32px; font-weight: bold; color: #0f172a; margin: 0; line-height: 1.3;">${data.subject || "The Weekly Muse"}</h1>
+            <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: #64748b; margin: 8px 0 0 0; font-weight: bold;">Issue #${data.issueNumber} &bull; ${currentMonthYear}</p>
+          </div>
+          
+          <!-- Hero Image -->
+          ${data.heroImage ? `<div style="width: 100%; aspect-ratio: 16/9; overflow: hidden;"><img src="${data.heroImage}" alt="Hero Banner" style="width: 100%; height: auto; display: block;" /></div>` : ''}
+          
+          <!-- Email Body -->
+          <div style="padding: 40px; font-family: Georgia, serif; font-size: 16px; color: #334155; line-height: 1.8;">
+            <h2 style="font-family: Georgia, serif; font-size: 20px; font-weight: bold; color: #0f172a; margin-top: 0; margin-bottom: 16px;">Hello, Rugumaho community.</h2>
+            <div>${data.content}</div>
+            
+            <!-- Dynamic CTA Button option -->
+            ${data.showCtaButton ? `
+            <div style="padding: 32px 0; text-align: center;">
+              <a href="${data.ctaPostLink}" target="_blank" style="background-color: #0f172a; color: #ffffff; padding: 14px 32px; border-radius: 8px; font-size: 14px; font-weight: bold; text-decoration: none; display: inline-block; font-family: system-ui, -apple-system, sans-serif;">
+                ${data.ctaButtonText}
+              </a>
+            </div>
+            ` : ''}
+          </div>
+          
+          <!-- Email Footer -->
+          <div style="padding: 40px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; text-align: center;">
+            <p style="font-size: 12px; color: #64748b; margin: 0 0 16px 0; line-height: 1.5;">
+              You're receiving this because you're part of the Rugumaho community.
+            </p>
+            <a href="#" style="font-size: 12px; color: #0f172a; font-weight: bold; text-decoration: underline;">Unsubscribe</a>
+          </div>
+        </div>
+      `
+    });
+    console.log(`Successfully sent test newsletter email to arianebloger@gmail.com via Resend.`);
+    return { success: true };
+  } catch (err: any) {
+    console.error("Failed to send test newsletter email:", err);
+    return { success: false, error: err.message || "Failed to deliver test message." };
+  }
+}
+
+export async function sendCampaignEmailServer(data: {
+  subject: string;
+  content: string;
+  heroImage?: string;
+  issueNumber: string;
+  showCtaButton: boolean;
+  ctaButtonText: string;
+  ctaPostLink: string;
+}) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.log("RESEND_API_KEY is not defined in env. Skipping campaign newsletter email.");
+    return { success: false, error: "Email configuration missing." };
+  }
+
+  try {
+    const resend = new Resend(apiKey);
+    const currentMonthYear = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    const subscribers = await getSubscribersServer();
+    const activeSubscribers = subscribers.filter((s: any) => s.status === "Active");
+    
+    if (activeSubscribers.length === 0) {
+      console.log("No active subscribers to send campaign newsletter to.");
+      return { success: true, count: 0 };
+    }
+
+    for (const sub of activeSubscribers) {
+      await resend.emails.send({
+        from: 'Ariane Rugumaho <hello@rugumaho.com>',
+        to: sub.email,
+        subject: data.subject || "The Weekly Muse",
+        html: `
+          <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #f1f5f9; border-radius: 16px; background-color: #ffffff; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
+            <div style="background-color: #0f172a; height: 6px; width: 100%;"></div>
+            
+            <!-- Email Header -->
+            <div style="padding: 45px 40px; border-bottom: 1px solid #f8fafc; text-align: center;">
+              <div style="font-family: Georgia, serif; font-size: 26px; font-weight: bold; color: #0f172a; margin-bottom: 24px; letter-spacing: 2px;">RUGUMAHO</div>
+              <h1 style="font-family: Georgia, serif; font-size: 32px; font-weight: bold; color: #0f172a; margin: 0; line-height: 1.3;">${data.subject || "The Weekly Muse"}</h1>
+              <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: #64748b; margin: 8px 0 0 0; font-weight: bold;">Issue #${data.issueNumber} &bull; ${currentMonthYear}</p>
+            </div>
+            
+            <!-- Hero Image -->
+            ${data.heroImage ? `<div style="width: 100%; aspect-ratio: 16/9; overflow: hidden;"><img src="${data.heroImage}" alt="Hero Banner" style="width: 100%; height: auto; display: block;" /></div>` : ''}
+            
+            <!-- Email Body -->
+            <div style="padding: 40px; font-family: Georgia, serif; font-size: 16px; color: #334155; line-height: 1.8;">
+              <h2 style="font-family: Georgia, serif; font-size: 20px; font-weight: bold; color: #0f172a; margin-top: 0; margin-bottom: 16px;">Hello ${sub.name || "friend"},</h2>
+              <div>${data.content}</div>
+              
+              <!-- Dynamic CTA Button option -->
+              ${data.showCtaButton ? `
+              <div style="padding: 32px 0; text-align: center;">
+                <a href="${data.ctaPostLink}" target="_blank" style="background-color: #0f172a; color: #ffffff; padding: 14px 32px; border-radius: 8px; font-size: 14px; font-weight: bold; text-decoration: none; display: inline-block; font-family: system-ui, -apple-system, sans-serif;">
+                  ${data.ctaButtonText}
+                </a>
+              </div>
+              ` : ''}
+            </div>
+            
+            <!-- Email Footer -->
+            <div style="padding: 40px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; text-align: center;">
+              <p style="font-size: 12px; color: #64748b; margin: 0 0 16px 0; line-height: 1.5;">
+                You're receiving this because you're part of the Rugumaho community.
+              </p>
+              <a href="#" style="font-size: 12px; color: #0f172a; font-weight: bold; text-decoration: underline;">Unsubscribe</a>
+            </div>
+          </div>
+        `
+      });
+    }
+
+    console.log(`Successfully sent campaign newsletter to ${activeSubscribers.length} subscribers via Resend.`);
+    return { success: true, count: activeSubscribers.length };
+  } catch (err: any) {
+    console.error("Failed to send campaign newsletter email:", err);
+    return { success: false, error: err.message || "Failed to deliver campaign messages." };
+  }
+}
+

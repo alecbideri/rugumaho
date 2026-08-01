@@ -17,7 +17,9 @@ import {
   getPendingCommentsServer,
   approveCommentServer,
   deleteCommentServer,
-  incrementPostViewsServer
+  incrementPostViewsServer,
+  sendNewsletterTestEmailServer,
+  sendCampaignEmailServer
 } from './sanityActions';
 
 export interface Post {
@@ -197,4 +199,28 @@ export async function deleteComment(id: string): Promise<void> {
 
 export async function incrementPostViews(slug: string): Promise<void> {
   await incrementPostViewsServer(slug);
+}
+
+export async function sendNewsletterTestEmail(data: {
+  subject: string;
+  content: string;
+  heroImage?: string;
+  issueNumber: string;
+  showCtaButton: boolean;
+  ctaButtonText: string;
+  ctaPostLink: string;
+}) {
+  return sendNewsletterTestEmailServer(data);
+}
+
+export async function sendCampaignEmail(data: {
+  subject: string;
+  content: string;
+  heroImage?: string;
+  issueNumber: string;
+  showCtaButton: boolean;
+  ctaButtonText: string;
+  ctaPostLink: string;
+}) {
+  return sendCampaignEmailServer(data);
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { addCampaign, getSubscribers, getCampaigns } from "../../../../lib/mockData";
+import { addCampaign, getSubscribers, getCampaigns, getPosts, Post, sendNewsletterTestEmail, sendCampaignEmail } from "../../../../lib/mockData";
 import { 
   Bold, 
   Italic, 
@@ -35,6 +35,10 @@ export default function ComposeNewsletterPage() {
   const [heroImage, setHeroImage] = useState("https://lh3.googleusercontent.com/aida-public/AB6AXuCCeeos0o_Q-UAyfR8pJcg75W35T3bUuOT3GfcX5DeEDh0oryz1ze-FP6r5UQcDrg6-0v0DyaxggRVbu7YkXZAow4cJnTAbiKLEdptcwtsSmNxyPrbMYPJrgvSAMJMdAOJysPeKof-CKQ8mPLK8Vbeiup7DJpWdiHCsjCsYozesDO2OS6EAp0oc1XJJ6paxzJUyqFGv3z7wsg0zTIspdIc0EClpoUz0FyKiZDKLvrUtyu6tZ4cXWKR86yOosLEjJ-b2et994oTRZ2U");
   const [content, setContent] = useState("");
   const [activeTab, setActiveTab] = useState<"write" | "templates" | "settings">("write");
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [showCtaButton, setShowCtaButton] = useState(false);
+  const [ctaButtonText, setCtaButtonText] = useState("Read the full story");
+  const [ctaPostLink, setCtaPostLink] = useState("");
   const [savedTime, setSavedTime] = useState("");
   const [showToast, setShowToast] = useState<string | null>(null);
   const [subscribersCount, setSubscribersCount] = useState(0);
@@ -114,6 +118,13 @@ export default function ComposeNewsletterPage() {
     getCampaigns().then((data) => {
       setIssueNumber((data.length + 1).toString());
     }).catch(err => console.error("Failed to load campaigns for issue count:", err));
+
+    getPosts().then((data) => {
+      setPosts(data);
+      if (data.length > 0) {
+        setCtaPostLink(`https://rugumaho.com/posts/${data[0].slug}`);
+      }
+    }).catch(err => console.error("Failed to load posts for linking options:", err));
   }, []);
 
   // Update save timestamp dynamically as they type
@@ -359,11 +370,36 @@ export default function ComposeNewsletterPage() {
   };
 
   const handleSaveDraft = () => {
+    const time = new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+    setSavedTime(time);
     triggerToast("Draft saved successfully!");
   };
 
-  const handleSendTestEmail = () => {
-    triggerToast("Test email sent to admin inbox!");
+  const handleSendTestEmail = async () => {
+    // 1. Instantly save draft
+    handleSaveDraft();
+    
+    // 2. Dispatch email to arianebloger@gmail.com
+    triggerToast("Sending test email...");
+    try {
+      const res = await sendNewsletterTestEmail({
+        subject: subject || "The Weekly Muse",
+        content,
+        heroImage: heroImage || undefined,
+        issueNumber,
+        showCtaButton,
+        ctaButtonText,
+        ctaPostLink
+      });
+      if (res.success) {
+        triggerToast("Test email sent & draft saved!");
+      } else {
+        alert("Resend API failed: " + (res.error || "Please check console."));
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert("Failed to send test email: " + err.message);
+    }
   };
 
   const handleSchedule = () => {
@@ -388,29 +424,46 @@ export default function ComposeNewsletterPage() {
     setShowScheduleModal(false);
   };
 
-  const handleSendNow = () => {
+  const handleSendNow = async () => {
     if (!subject.trim()) {
       alert("Please enter a subject line before sending.");
       return;
     }
 
-    const currentMonthYear = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-    
-    addCampaign({
-      title: subject,
-      sentDate: currentMonthYear,
-      recipients: subscribersCount,
-      openRate: "0.0%",
-      clickRate: "0.0%"
-    }).then(() => {
-      triggerToast("Newsletter sent successfully!");
-      setTimeout(() => {
-        router.push("/admin/newsletter");
-      }, 1500);
-    }).catch((err) => {
-      console.error("Error saving campaign in Sanity:", err);
-      alert("Failed to send newsletter. See console.");
-    });
+    triggerToast("Sending to subscribers...");
+    try {
+      const emailRes = await sendCampaignEmail({
+        subject,
+        content,
+        heroImage: heroImage || undefined,
+        issueNumber,
+        showCtaButton,
+        ctaButtonText,
+        ctaPostLink
+      });
+
+      if (emailRes.success) {
+        const currentMonthYear = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        
+        await addCampaign({
+          title: subject,
+          sentDate: currentMonthYear,
+          recipients: subscribersCount,
+          openRate: "0.0%",
+          clickRate: "0.0%"
+        });
+
+        triggerToast("Newsletter sent successfully!");
+        setTimeout(() => {
+          router.push("/admin/newsletter");
+        }, 1500);
+      } else {
+        alert("Resend failed: " + (emailRes.error || "Please check console."));
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert("Failed to send newsletter: " + err.message);
+    }
   };
 
   const currentMonthYear = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
@@ -612,6 +665,58 @@ export default function ComposeNewsletterPage() {
                     onInput={handleEditorInput}
                   />
                 </div>
+
+                {/* CTA Link Manager */}
+                <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <label className="text-sm font-bold text-slate-950 dark:text-white block">Add Call-To-Action Button</label>
+                      <span className="text-xs text-slate-500">Include a high-profile link button to a single blog post</span>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={showCtaButton} 
+                        onChange={(e) => setShowCtaButton(e.target.checked)}
+                        className="sr-only peer" 
+                      />
+                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-primary"></div>
+                    </label>
+                  </div>
+
+                  {showCtaButton && (
+                    <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200/50 dark:border-slate-800/50">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block font-sans">Link to Blog Post</label>
+                        <select 
+                          value={ctaPostLink}
+                          onChange={(e) => setCtaPostLink(e.target.value)}
+                          className="w-full text-xs font-semibold text-slate-700 dark:text-slate-200 rounded-lg border border-slate-200 dark:border-slate-800 bg-transparent py-2.5 px-3 focus:border-primary outline-none"
+                        >
+                          {posts.map((p) => (
+                            <option key={p.slug} value={`https://rugumaho.com/posts/${p.slug}`}>
+                              {p.title}
+                            </option>
+                          ))}
+                          {posts.length === 0 && (
+                            <option value="">No blog posts found</option>
+                          )}
+                        </select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block font-sans">Button Text</label>
+                        <input 
+                          type="text" 
+                          value={ctaButtonText} 
+                          onChange={(e) => setCtaButtonText(e.target.value)}
+                          placeholder="Read the full story"
+                          className="w-full text-xs font-semibold text-slate-700 dark:text-slate-200 rounded-lg border border-slate-200 dark:border-slate-800 bg-transparent py-2.5 px-3 focus:border-primary outline-none"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </>
             )}
 
@@ -729,15 +834,18 @@ export default function ComposeNewsletterPage() {
                 className="wysiwyg-newsletter-content text-slate-600 dark:text-slate-300 leading-relaxed text-lg font-serif"
                 dangerouslySetInnerHTML={{ __html: content }}
               />
-              <div className="py-8">
-                <button 
-                  type="button"
-                  onClick={() => alert("Action: Read the full story button clicked.")}
-                  className="bg-primary text-white dark:text-slate-900 font-bold px-8 py-3 rounded-lg hover:bg-opacity-90 transition-all cursor-pointer"
-                >
-                  Read the full story
-                </button>
-              </div>
+              {showCtaButton && (
+                <div className="py-8">
+                  <a 
+                    href={ctaPostLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-block bg-primary text-white dark:text-slate-900 font-bold px-8 py-3 rounded-lg hover:bg-opacity-90 transition-all cursor-pointer text-sm font-sans"
+                  >
+                    {ctaButtonText || "Read the full story"}
+                  </a>
+                </div>
+              )}
             </div>
             
             {/* Email Footer */}
