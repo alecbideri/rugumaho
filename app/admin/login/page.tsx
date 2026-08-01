@@ -3,8 +3,9 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle, Eye, EyeOff, Flower } from "lucide-react";
+import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import NotFound from "@/app/not-found";
+import Logo from "@/components/Logo";
 
 function LoginContent() {
   const [email, setEmail] = useState("");
@@ -67,9 +68,9 @@ function LoginContent() {
     >
       <div className="w-full max-w-[420px] bg-white rounded-[32px] p-8 sm:p-10 shadow-[0_20px_50px_rgba(43,205,238,0.12)] border border-slate-100/80 relative z-10">
         
-        {/* Flower Brand Icon */}
+        {/* Brand Logo with optional writing animation */}
         <div className="flex justify-center mb-6">
-          <Flower className="w-10 h-10 text-primary" />
+          <Logo className="h-10 w-auto" animate={loading} />
         </div>
 
         {/* Header Title */}

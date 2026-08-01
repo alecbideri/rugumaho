@@ -19,13 +19,13 @@ import {
   Calendar,
   X,
   FileText,
-  Flower,
   Mail,
   ArrowLeft,
   ArrowRight,
   Quote
 } from "lucide-react";
 import { uploadImageToImageKit } from "../../../../lib/imagekitActions";
+import Logo from "@/components/Logo";
 
 export default function ComposeNewsletterPage() {
   const router = useRouter();
@@ -480,10 +480,8 @@ export default function ComposeNewsletterPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-2">
-              <Flower className="text-primary w-8 h-8 shrink-0 animate-spin-slow" />
-              <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                Rugumaho <span className="font-normal text-slate-500">Studio</span>
-              </h1>
+              <Logo className="h-7 w-auto shrink-0" />
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Studio</span>
             </div>
           </div>
         </div>
@@ -683,10 +681,9 @@ export default function ComposeNewsletterPage() {
           <div className="bg-white dark:bg-slate-900 w-full max-w-[600px] shadow-2xl rounded-lg overflow-hidden flex flex-col border border-slate-100 dark:border-slate-800/50">
             <div className="bg-primary h-1.5 w-full"></div>
             
-            {/* Email Header */}
             <div className="p-10 border-b border-slate-50 dark:border-slate-800/40 text-center">
-              <div className="text-primary mb-6 flex justify-center">
-                <Flower className="w-10 h-10 animate-spin-slow" />
+              <div className="flex justify-center mb-6">
+                <Logo className="h-10 w-auto" animate={true} />
               </div>
               <h1 className="serif-heading text-4xl font-bold text-slate-900 dark:text-white leading-tight">
                 {subject || "The Weekly Muse"}

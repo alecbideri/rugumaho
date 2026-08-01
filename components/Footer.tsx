@@ -1,5 +1,5 @@
-import { Flower } from "lucide-react";
 import Link from "next/link";
+import Logo from "./Logo";
 
 export default function Footer() {
   return (
@@ -7,9 +7,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-8">
         
         {/* Logo */}
-        <div className="flex items-center gap-2">
-          <Flower className="text-primary w-6 h-6" />
-          <h1 className="font-serif text-xl font-bold tracking-tight text-slate-900">Rugumaho</h1>
+        <div className="flex items-center">
+          <Logo className="h-6 w-auto" />
         </div>
         
         {/* Center links */}

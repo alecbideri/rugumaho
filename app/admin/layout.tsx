@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Mail, LogOut, BookOpen, X, Menu, Flower } from "lucide-react";
+import { LayoutDashboard, Mail, LogOut, BookOpen, X, Menu } from "lucide-react";
+import Logo from "@/components/Logo";
 
 export default function AdminLayout({
   children,
@@ -88,9 +89,8 @@ export default function AdminLayout({
       >
         <div className="flex flex-col">
           {/* Logo Header */}
-          <div className="p-8 flex items-center gap-3">
-            <Flower className="text-primary w-8 h-8 shrink-0" />
-            <h1 className="font-serif text-2xl font-bold tracking-tight text-slate-800">Rugumaho</h1>
+          <div className="p-8 flex items-center">
+            <Logo className="h-8 w-auto" />
           </div>
           
           {/* Navigation Links */}

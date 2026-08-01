@@ -7,7 +7,7 @@ Here are the three premium typographic wordmark proposals for **RUGUMAHO** incor
 ## Proposal 1: Typographic Serif (Previously Proposal 3)
 A modern serif wordmark styling of the brand name **RUGUMAHO** featuring a subtle fountain pen nib integrated into the typography itself. Clean, sophisticated, and memorable.
 
-![Proposal 1: Typographic Serif](public/logos/rugumaho_logo_wordmark_nib.svg)
+![Proposal 1: Typographic Serif](public/logos/rugumaho_logo_wordmark_nib.png)
 
 ---
 

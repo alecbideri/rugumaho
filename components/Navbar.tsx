@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Flower, Search, Menu, X } from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 import { getPosts, Post } from "../lib/mockData";
+import Logo from "./Logo";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -76,9 +77,8 @@ export default function Navbar() {
           
           {/* Left: Brand Logo */}
           <div className="flex items-center shrink-0">
-            <Link href="/" className="flex items-center gap-2 group">
-              <Flower className="text-primary w-8 h-8 group-hover:rotate-12 transition-transform duration-300" />
-              <h1 className="font-serif text-2xl font-bold tracking-tight text-slate-900">Rugumaho</h1>
+            <Link href="/" className="flex items-center group">
+              <Logo className="h-8 w-auto" />
             </Link>
           </div>
           

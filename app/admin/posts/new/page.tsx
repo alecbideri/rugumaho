@@ -22,11 +22,11 @@ import {
   Eye,
   Sparkles,
   CheckCircle,
-  Flower,
   ArrowRight
 } from "lucide-react";
 import { getPosts, addPost, updatePost, Post } from "../../../../lib/mockData";
 import { uploadImageToImageKit } from "../../../../lib/imagekitActions";
+import Logo from "@/components/Logo";
 
 // Loading Fallback for Suspense
 function LoadingFallback() {
@@ -589,10 +589,8 @@ function NewPostEditor() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-2">
-              <Flower className="text-primary w-8 h-8 shrink-0 animate-spin-slow" />
-              <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                Rugumaho <span className="font-normal text-slate-500">Studio</span>
-              </h1>
+              <Logo className="h-7 w-auto shrink-0" />
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Studio</span>
             </div>
           </div>
           <div className="h-4 w-px bg-slate-200 dark:bg-slate-700"></div>
