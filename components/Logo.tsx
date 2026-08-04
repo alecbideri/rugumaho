@@ -11,27 +11,27 @@ export default function Logo({ className = "h-10 w-auto", animate = false }: Log
   return (
     <svg 
       xmlns="http://www.w3.org/2000/svg" 
-      viewBox="80 440 875 195" 
+      viewBox="80 440 875 205" 
       className={`${className} text-slate-900 dark:text-white`}
     >
       <defs>
         <style>
           {`
-            .svg-nib {
-              transform-origin: 896px 577px;
+            .svg-mic {
+              transform-origin: 900px 633px;
             }
-            .animate-nib-writing {
-              animation: nib-write 2.5s ease-in-out infinite alternate;
+            .animate-mic-recording {
+              animation: mic-record 2s ease-in-out infinite alternate;
             }
-            @keyframes nib-write {
+            @keyframes mic-record {
               0% {
-                transform: rotate(0deg) translate(0, 0);
+                transform: rotate(-8deg) scale(0.97);
               }
               50% {
-                transform: rotate(-10deg) translate(-2px, 1px);
+                transform: rotate(0deg) scale(1.03);
               }
               100% {
-                transform: rotate(10deg) translate(2px, -1px);
+                transform: rotate(8deg) scale(0.97);
               }
             }
           `}
@@ -39,9 +39,16 @@ export default function Logo({ className = "h-10 w-auto", animate = false }: Log
       </defs>
 
       <g fill="currentColor" fillRule="evenodd">
-        {/* Animated Fountain Pen Nib (Path 1) */}
-        <g className={`svg-nib ${animate ? "animate-nib-writing" : ""}`}>
-          <path d="M 888 577 L 887 578 L 887 581 L 886 582 L 886 586 L 885 587 L 885 589 L 884 590 L 884 592 L 883 593 L 883 594 L 882 595 L 882 596 L 881 597 L 881 598 L 882 599 L 882 600 L 884 602 L 884 603 L 886 605 L 886 606 L 887 607 L 887 608 L 889 610 L 889 611 L 890 612 L 890 613 L 891 614 L 891 615 L 892 616 L 892 618 L 893 619 L 893 621 L 894 622 L 893 623 L 893 625 L 894 625 L 894 601 L 895 600 L 892 597 L 892 595 L 894 593 L 897 593 L 899 595 L 899 598 L 897 600 L 897 625 L 898 625 L 898 619 L 899 618 L 899 617 L 900 616 L 900 615 L 901 614 L 901 613 L 902 612 L 902 611 L 903 610 L 903 609 L 904 608 L 904 607 L 906 605 L 906 604 L 909 601 L 909 600 L 911 598 L 910 597 L 910 596 L 909 595 L 909 594 L 908 593 L 908 591 L 907 590 L 907 589 L 906 588 L 906 585 L 905 584 L 905 581 L 904 580 L 904 577 Z" />
+        {/* Animated Podcast Microphone (v3) */}
+        <g className={`svg-mic ${animate ? "animate-mic-recording" : ""}`}>
+          {/* Shield ring on the left side of capsule */}
+          <path d="M 884 572 L 884 602 L 886 602 L 886 572 Z" />
+          {/* Microphone capsule (smooth rounded rectangle) */}
+          <path d="M 890 568 C 890 562, 910 562, 910 568 L 910 600 C 910 606, 890 606, 890 600 Z" />
+          {/* Simple wire-holder mount */}
+          <path d="M 883 585 L 883 605 C 883 615, 917 615, 917 605 L 917 585 L 913 585 L 913 605 C 913 611, 887 611, 887 605 L 887 585 Z" />
+          {/* Desk base stand */}
+          <path d="M 900 613 L 900 633 L 885 633 L 885 637 L 915 637 L 915 633 L 900 633 Z" />
         </g>
 
         {/* Wordmark paths (Paths 2-12) */}

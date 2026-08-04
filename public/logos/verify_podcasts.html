@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rugumaho Podcast Logo Variations</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 60px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georgia, serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      text-align: center;
+    }
+    h1 {
+      font-family: Georgia, serif;
+      font-size: 32px;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    p {
+      color: #64748b;
+      font-size: 16px;
+      margin-bottom: 60px;
+    }
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 50px;
+      align-items: center;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .variant-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      box-sizing: border-box;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      text-align: left;
+    }
+    .variant-header {
+      font-family: Georgia, serif;
+      font-size: 20px;
+      font-weight: bold;
+      color: #0f172a;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .variant-tag {
+      font-family: sans-serif;
+      font-size: 11px;
+      background-color: #f1f5f9;
+      color: #475569;
+      padding: 4px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .variant-logo-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 180px;
+      color: #0f172a; /* fill="currentColor" inherits this color */
+      background-color: #ffffff;
+      border-radius: 8px;
+    }
+    /* Set the SVG to scale nicely and focus on the logo paths */
+    .variant-logo-container svg {
+      height: 120px;
+      width: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Rugumaho Podcast Logo Concepts</h1>
+  <p>Three vector concepts matching the official font style, replacing the pen nib with different microphone shapes.</p>
+
+  <div class="grid">
+    <!-- Variant 1 -->
+    <div class="variant-card" id="card-v1">
+      <div class="variant-header">
+        <span>Proposal 1: Retro Ribbed Condenser Mic</span>
+        <span class="variant-tag">Concept A</span>
+      </div>
+      <div class="variant-logo-container">
+        <!-- We embed the SVG inline or via object/img so it styles correctly -->
+        <object type="image/svg+xml" data="./rugumaho_logo_microphone_v1.svg" width="100%" height="100%"></object>
+      </div>
+    </div>
+
+    <!-- Variant 2 -->
+    <div class="variant-card" id="card-v2">
+      <div class="variant-header">
+        <span>Proposal 2: Modern Capsule with Shock Mount Ring</span>
+        <span class="variant-tag">Concept B</span>
+      </div>
+      <div class="variant-logo-container">
+        <object type="image/svg+xml" data="./rugumaho_logo_microphone_v2.svg" width="100%" height="100%"></object>
+      </div>
+    </div>
+
+    <!-- Variant 3 -->
+    <div class="variant-card" id="card-v3">
+      <div class="variant-header">
+        <span>Proposal 3: Sleek Studio Desk Mic with Pop Filter</span>
+        <span class="variant-tag">Concept C</span>
+      </div>
+      <div class="variant-logo-container">
+        <object type="image/svg+xml" data="./rugumaho_logo_microphone_v3.svg" width="100%" height="100%"></object>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
