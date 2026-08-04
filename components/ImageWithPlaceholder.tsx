@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface ImageWithPlaceholderProps {
   src: string;
@@ -18,10 +18,15 @@ export default function ImageWithPlaceholder({
   placeholderClassName = ""
 }: ImageWithPlaceholderProps) {
   const [isLoaded, setIsLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
 
-  // Reset loaded state if src changes (e.g. when changing pages or carousel slides)
+  // Check if image is already cached/loaded when mounting or changing src
   useEffect(() => {
-    setIsLoaded(false);
+    if (imgRef.current && imgRef.current.complete) {
+      setIsLoaded(true);
+    } else {
+      setIsLoaded(false);
+    }
   }, [src]);
 
   return (
@@ -35,6 +40,7 @@ export default function ImageWithPlaceholder({
       
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
+        ref={imgRef}
         src={src}
         alt={alt}
         onLoad={() => setIsLoaded(true)}
