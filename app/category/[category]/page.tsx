@@ -71,7 +71,7 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   },
   travel: {
     tagline: "Exploring the world's quiet corners with heart and purpose.",
-    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuDE6cKnPXAXm3hlYgs7rJjklsuMTk0ej6Bhgnma02i0k_GRA8aKtZ4qhRepGMWw3PpUh67KJ_ndXkBed1pyE4xZFqXvNpT1Pz4w-9Q3jfSgBoIzBWJ09fvkWySmwwwIYbuzEmBYNG2gsWJX4rfA0E4EoA2eDYfzNt4SPTkbdQboBlNchaAKegJATn7Fi0kq1ofK73URZyUQOVRy0fQgaYyZ01-7HDKk_MgUCmVXORA8-XzzRU4mCZin6cx8XDdTwt-VuMLV6CiINdk"
+    coverImage: "/covers/travel_category.png"
   },
   fitness: {
     tagline: "Strength, endurance, and physical health for a vibrant lifestyle.",
