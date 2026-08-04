@@ -17,21 +17,47 @@ export default function Logo({ className = "h-10 w-auto", animate = false }: Log
       <defs>
         <style>
           {`
-            .svg-mic {
-              transform-origin: 900px 633px;
+            .svg-wave-inner, .svg-wave-outer {
+              transform-origin: 900px 585px;
+              transition: opacity 0.3s ease;
             }
-            .animate-mic-recording {
-              animation: mic-record 2s ease-in-out infinite alternate;
+            .animate-wave-pulse {
+              animation: wave-glow-1 1.4s ease-in-out infinite;
             }
-            @keyframes mic-record {
+            .animate-wave-pulse-delayed {
+              animation: wave-glow-2 1.4s ease-in-out infinite;
+            }
+            @keyframes wave-glow-1 {
               0% {
-                transform: rotate(-8deg) scale(0.97);
+                opacity: 0;
+                transform: scale(0.85);
               }
-              50% {
-                transform: rotate(0deg) scale(1.03);
+              30% {
+                opacity: 0.8;
+              }
+              70% {
+                opacity: 0;
+                transform: scale(1.1);
               }
               100% {
-                transform: rotate(8deg) scale(0.97);
+                opacity: 0;
+                transform: scale(1.1);
+              }
+            }
+            @keyframes wave-glow-2 {
+              0% {
+                opacity: 0;
+                transform: scale(0.9);
+              }
+              30% {
+                opacity: 0;
+              }
+              60% {
+                opacity: 0.8;
+              }
+              100% {
+                opacity: 0;
+                transform: scale(1.25);
               }
             }
           `}
@@ -39,16 +65,34 @@ export default function Logo({ className = "h-10 w-auto", animate = false }: Log
       </defs>
 
       <g fill="currentColor" fillRule="evenodd">
-        {/* Animated Podcast Microphone (v3) */}
-        <g className={`svg-mic ${animate ? "animate-mic-recording" : ""}`}>
-          {/* Shield ring on the left side of capsule */}
-          <path d="M 884 572 L 884 602 L 886 602 L 886 572 Z" />
-          {/* Microphone capsule (smooth rounded rectangle) */}
-          <path d="M 890 568 C 890 562, 910 562, 910 568 L 910 600 C 910 606, 890 606, 890 600 Z" />
-          {/* Simple wire-holder mount */}
-          <path d="M 883 585 L 883 605 C 883 615, 917 615, 917 605 L 917 585 L 913 585 L 913 605 C 913 611, 887 611, 887 605 L 887 585 Z" />
-          {/* Desk base stand */}
-          <path d="M 900 613 L 900 633 L 885 633 L 885 637 L 915 637 L 915 633 L 900 633 Z" />
+        {/* Animated Podcast Microphone (v1) */}
+        <g>
+          {/* U-mount stand */}
+          <path d="M 870 595 A 30 30 0 0 0 930 595 L 935 595 L 935 590 L 925 590 L 925 595 A 20 20 0 0 1 875 595 L 875 590 L 865 590 Z" />
+          {/* Stem and base stand */}
+          <path d="M 897 618 L 897 635 L 885 635 L 885 640 L 915 640 L 915 635 L 903 635 L 903 618 Z" />
+          {/* Microphone capsule (ribbed oval) */}
+          <path d="M 885 570 C 885 560, 915 560, 915 570 L 915 595 C 915 605, 885 605, 885 595 Z" />
+          {/* Capsule inner grill horizontal ribs */}
+          <path d="M 888 575 L 912 575 L 912 578 L 888 578 Z M 888 583 L 912 583 L 912 586 L 888 586 Z M 888 591 L 912 591 L 912 594 L 888 594 Z M 888 597 L 912 597 L 912 600 L 888 600 Z" />
+
+          {/* Soundwaves for loading/broadcasting states */}
+          <path 
+            className={`svg-wave-inner ${animate ? "animate-wave-pulse" : "opacity-0"}`} 
+            d="M 872 572 A 15 15 0 0 0 872 598 M 928 572 A 15 15 0 0 1 928 598" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="3" 
+            strokeLinecap="round" 
+          />
+          <path 
+            className={`svg-wave-outer ${animate ? "animate-wave-pulse-delayed" : "opacity-0"}`} 
+            d="M 862 562 A 30 30 0 0 0 862 608 M 938 562 A 30 30 0 0 1 938 608" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="3" 
+            strokeLinecap="round" 
+          />
         </g>
 
         {/* Wordmark paths (Paths 2-12) */}
