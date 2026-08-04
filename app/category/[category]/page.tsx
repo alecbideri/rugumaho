@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
+import ImageWithPlaceholder from "../../../components/ImageWithPlaceholder";
 
 // Custom brand icons since Lucide deprecated them
 const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -249,10 +250,12 @@ export default function CategoryPage({ params }: PageProps) {
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl shadow-2xl group">
-          <div 
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-102" 
-            style={{ backgroundImage: `url("${config.coverImage}")` }}
-          ></div>
+          <ImageWithPlaceholder
+            src={config.coverImage}
+            alt={categoryName}
+            containerClassName="absolute inset-0"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-102"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-990 via-slate-950/30 to-transparent"></div>
           <div className="absolute bottom-0 left-0 p-8 md:p-16 text-left">
             <div className="w-12 h-1 bg-primary mb-4"></div>
@@ -391,10 +394,10 @@ export default function CategoryPage({ params }: PageProps) {
                     <div>
                       {/* Card Image */}
                       <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                        <ImageWithPlaceholder
                           src={post.coverImage || "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634"} 
                           alt={post.title}
+                          containerClassName="w-full h-full"
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-108"
                         />
                         {post.tags && post.tags[0] && (

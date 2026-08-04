@@ -19,6 +19,7 @@ import {
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import Logo from "../../../components/Logo";
+import ImageWithPlaceholder from "../../../components/ImageWithPlaceholder";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -442,11 +443,11 @@ export default function BlogPostPage({ params }: PageProps) {
         {post.coverImage && (
           <figure className="mx-auto mt-12 max-w-[720px]">
             <div className="aspect-[16/9] overflow-hidden rounded-xl shadow-xl shadow-slate-200/50">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img 
-                className="h-full w-full object-cover" 
-                alt={post.title} 
+              <ImageWithPlaceholder
                 src={post.coverImage}
+                alt={post.title}
+                containerClassName="w-full h-full"
+                className="w-full h-full object-cover"
               />
             </div>
             {post.slug === "the-hidden-gems-of-rwandas-countryside" && (
@@ -498,11 +499,11 @@ export default function BlogPostPage({ params }: PageProps) {
               {recommended.map((rec) => (
                 <Link key={rec.id} href={`/posts/${rec.slug}`} className="group cursor-pointer block">
                   <div className="aspect-[4/5] overflow-hidden rounded-xl bg-slate-50 border border-slate-100 relative">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img 
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                      alt={rec.title} 
+                    <ImageWithPlaceholder
                       src={rec.coverImage || "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634"}
+                      alt={rec.title}
+                      containerClassName="w-full h-full animate-fadeIn"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                   </div>
                   <p className="mt-4 text-xs font-bold uppercase tracking-wider text-primary">{rec.category}</p>

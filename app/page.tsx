@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import ImageWithPlaceholder from "../components/ImageWithPlaceholder";
 
 export default function Home() {
   const [allPosts, setAllPosts] = useState<Post[]>([]);
@@ -186,12 +187,14 @@ export default function Home() {
                           href={`/posts/${post.slug}`}
                           className="relative w-full aspect-[4/3] lg:aspect-square overflow-hidden rounded-xl shadow-lg group block cursor-pointer"
                         >
-                          <div 
-                            className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
-                            style={{ backgroundImage: `url("${post.coverImage || "https://images.unsplash.com/photo-1499750310107-5fef28a66643"}")` }}
-                          ></div>
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60"></div>
-                          <div className="absolute bottom-6 left-6 text-white flex items-center gap-2">
+                          <ImageWithPlaceholder
+                             src={post.coverImage || "https://images.unsplash.com/photo-1499750310107-5fef28a66643"}
+                             alt={post.title}
+                             containerClassName="w-full h-full"
+                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                           />
+                           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 z-20"></div>
+                           <div className="absolute bottom-6 left-6 text-white flex items-center gap-2 z-20">
                             <Camera className="w-5 h-5" />
                             <span className="text-sm font-semibold">{post.category || "Featured Journal"}</span>
                           </div>
@@ -293,12 +296,14 @@ export default function Home() {
                 {/* Main Featured Article (only shown when available) */}
                 {mounted && featuredPost && (
                   <div className="flex flex-col md:flex-row gap-8 items-stretch rounded-xl bg-white dark:bg-slate-800 p-6 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
-                    <div className="w-full md:w-1/2 aspect-video md:aspect-auto overflow-hidden rounded-lg relative group">
-                      <div 
-                        className="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105 min-h-[260px] md:min-h-full" 
-                        style={{ backgroundImage: `url("${featuredPost.coverImage || "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634"}")` }}
-                      ></div>
-                    </div>
+                     <div className="w-full md:w-1/2 aspect-video md:aspect-auto overflow-hidden rounded-lg relative group min-h-[260px] md:min-h-full">
+                       <ImageWithPlaceholder
+                         src={featuredPost.coverImage || "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634"}
+                         alt={featuredPost.title}
+                         containerClassName="w-full h-full absolute inset-0"
+                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                       />
+                     </div>
                     <div className="flex flex-col justify-center gap-4 w-full md:w-1/2">
                       <div className="flex items-center gap-2 text-xs font-medium text-primary uppercase tracking-wider">
                         <Calendar className="w-3.5 h-3.5" />
@@ -333,11 +338,13 @@ export default function Home() {
                         href={`/posts/${post.slug}`}
                         className="flex flex-col gap-4 group cursor-pointer"
                       >
-                        <div className="overflow-hidden rounded-xl aspect-[4/3] relative">
-                          <div 
-                            className="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" 
-                            style={{ backgroundImage: `url("${post.coverImage || "https://images.unsplash.com/photo-1499750310107-5fef28a66643"}")` }}
-                          ></div>
+                         <div className="overflow-hidden rounded-xl aspect-[4/3] relative">
+                           <ImageWithPlaceholder
+                             src={post.coverImage || "https://images.unsplash.com/photo-1499750310107-5fef28a66643"}
+                             alt={post.title}
+                             containerClassName="w-full h-full"
+                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                           />
                           {post.category && (
                             <div className="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm border border-slate-100 dark:border-slate-800">
                               {post.category}
