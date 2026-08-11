@@ -16,7 +16,7 @@ export default function AboutPage() {
         {/* Story Section */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Column: Portrait image */}
-          <div className="relative aspect-[3/4] max-w-md mx-auto w-full overflow-hidden rounded-xl shadow-2xl border border-slate-100 bg-white">
+          <div className="relative aspect-square max-w-md mx-auto w-full overflow-hidden rounded-xl shadow-2xl border border-slate-100 bg-white">
             <ImageWithPlaceholder
               src="/profile.png"
               alt="Ariane Rugumaho portrait"
