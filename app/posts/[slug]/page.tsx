@@ -372,6 +372,16 @@ export default function BlogPostPage({ params }: PageProps) {
 
   return (
     <div className="dot-grid min-h-screen bg-white font-display text-slate-900 transition-colors duration-200 flex flex-col">
+      {post && (
+        <>
+          <title>{`${post.title} | Rugumaho`}</title>
+          <meta name="description" content={post.excerpt} />
+          <meta property="og:title" content={`${post.title} | Rugumaho`} />
+          <meta property="og:description" content={post.excerpt} />
+          {post.coverImage && <meta property="og:image" content={post.coverImage} />}
+          <meta property="og:type" content="article" />
+        </>
+      )}
       <Navbar />
 
       {/* Floating Left Sidebar Social Actions */}

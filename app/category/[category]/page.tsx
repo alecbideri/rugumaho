@@ -244,6 +244,11 @@ export default function CategoryPage({ params }: PageProps) {
 
   return (
     <div className="dot-grid min-h-screen bg-white font-display text-slate-900 transition-colors duration-200">
+      <title>{`${categoryName} Journal | Rugumaho`}</title>
+      <meta name="description" content={config.tagline} />
+      <meta property="og:title" content={`${categoryName} Journal | Rugumaho`} />
+      <meta property="og:description" content={config.tagline} />
+      <meta property="og:image" content={config.coverImage} />
       
       <Navbar />
 

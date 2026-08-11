@@ -9,6 +9,11 @@ import ImageWithPlaceholder from "../../components/ImageWithPlaceholder";
 export default function AboutPage() {
   return (
     <div className="dot-grid min-h-screen bg-[#f6f8f8] font-display text-slate-900 transition-colors duration-200 flex flex-col">
+      <title>About Ariane | Rugumaho</title>
+      <meta name="description" content="Read the story behind Rugumaho—curated reflections on slow living, travel, motherhood, and intentional practices." />
+      <meta property="og:title" content="About Ariane | Rugumaho" />
+      <meta property="og:description" content="Read the story behind Rugumaho—curated reflections on slow living, travel, motherhood, and intentional practices." />
+      
       <Navbar />
 
       <main className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 pb-24 flex-grow space-y-24">
