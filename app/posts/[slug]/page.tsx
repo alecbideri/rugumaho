@@ -380,6 +380,39 @@ export default function BlogPostPage({ params }: PageProps) {
           <meta property="og:description" content={post.excerpt} />
           {post.coverImage && <meta property="og:image" content={post.coverImage} />}
           <meta property="og:type" content="article" />
+          <link rel="canonical" href={`https://rugumaho.com/posts/${post.slug}`} />
+          
+          {/* JSON-LD Structured Data Schema for Search Engines (Rich Snippets) */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BlogPosting",
+                "headline": post.title,
+                "description": post.excerpt,
+                "image": post.coverImage || "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634",
+                "datePublished": post.createdAt,
+                "author": {
+                  "@type": "Person",
+                  "name": "Ariane Rugumaho",
+                  "url": "https://rugumaho.com/about"
+                },
+                "publisher": {
+                  "@type": "Organization",
+                  "name": "Rugumaho",
+                  "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://rugumaho.com/logos/rugumaho_logo_microphone_v1.svg"
+                  }
+                },
+                "mainEntityOfPage": {
+                  "@type": "WebPage",
+                  "@id": `https://rugumaho.com/posts/${post.slug}`
+                }
+              })
+            }}
+          />
         </>
       )}
       <Navbar />

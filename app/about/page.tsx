@@ -13,6 +13,29 @@ export default function AboutPage() {
       <meta name="description" content="Read the story behind Rugumaho—curated reflections on slow living, travel, motherhood, and intentional practices." />
       <meta property="og:title" content="About Ariane | Rugumaho" />
       <meta property="og:description" content="Read the story behind Rugumaho—curated reflections on slow living, travel, motherhood, and intentional practices." />
+      <link rel="canonical" href="https://rugumaho.com/about" />
+      
+      {/* JSON-LD Person Schema for Creator Profile Rich Snippets */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": "Ariane Rugumaho",
+            "url": "https://rugumaho.com/about",
+            "image": "https://rugumaho.com/profile.png",
+            "sameAs": [
+              "https://instagram.com/arianerugumaho"
+            ],
+            "jobTitle": "Author & Creator",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "Rugumaho"
+            }
+          })
+        }}
+      />
       
       <Navbar />
 

@@ -249,6 +249,7 @@ export default function CategoryPage({ params }: PageProps) {
       <meta property="og:title" content={`${categoryName} Journal | Rugumaho`} />
       <meta property="og:description" content={config.tagline} />
       <meta property="og:image" content={config.coverImage} />
+      <link rel="canonical" href={`https://rugumaho.com/category/${rawCategory.toLowerCase()}`} />
       
       <Navbar />
 
