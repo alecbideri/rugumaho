@@ -62,6 +62,7 @@ const INITIAL_CAMPAIGNS: Campaign[] = [
 export default function AdminNewsletterPage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>(INITIAL_SUBSCRIBERS);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [selectedReportCampaign, setSelectedReportCampaign] = useState<Campaign | null>(null);
   
   // Search & Pagination States
   const [globalSearch, setGlobalSearch] = useState("");
@@ -418,7 +419,7 @@ export default function AdminNewsletterPage() {
                     <p className="text-lg font-bold text-primary mt-0.5">{camp.clickRate}</p>
                   </div>
                   <button 
-                    onClick={() => alert(`Report for "${camp.title}":\n\nTotal Recipients: ${camp.recipients}\nOpen Rate: ${camp.openRate}\nClick Rate: ${camp.clickRate}`)}
+                    onClick={() => setSelectedReportCampaign(camp)}
                     className="px-4 py-2 text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer text-slate-700 dark:text-slate-200"
                   >
                     View Report
@@ -429,6 +430,58 @@ export default function AdminNewsletterPage() {
           </div>
         </section>
       </div>
+
+      {/* Campaign Report Modal */}
+      {selectedReportCampaign && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-8 shadow-2xl border border-slate-100 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200 relative">
+            <button 
+              onClick={() => setSelectedReportCampaign(null)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-900 dark:hover:text-white p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <div className="text-center mb-6">
+              <div className="size-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
+                <FileText className="w-6 h-6" />
+              </div>
+              <h3 className="font-serif text-xl font-bold text-slate-900 dark:text-white truncate px-4" title={selectedReportCampaign.title}>
+                {selectedReportCampaign.title}
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">Sent on {selectedReportCampaign.sentDate}</p>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-4 py-6 border-y border-slate-100 dark:border-slate-800 mb-6">
+              <div className="text-center">
+                <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Recipients</p>
+                <p className="text-lg font-bold text-slate-900 dark:text-white mt-1">
+                  {selectedReportCampaign.recipients.toLocaleString()}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Open Rate</p>
+                <p className="text-lg font-bold text-primary mt-1">
+                  {selectedReportCampaign.openRate}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Click Rate</p>
+                <p className="text-lg font-bold text-primary mt-1">
+                  {selectedReportCampaign.clickRate}
+                </p>
+              </div>
+            </div>
+            
+            <button
+              onClick={() => setSelectedReportCampaign(null)}
+              className="w-full bg-slate-900 hover:bg-primary text-white font-bold h-12 rounded-lg text-sm transition-all cursor-pointer"
+            >
+              Close Report
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
