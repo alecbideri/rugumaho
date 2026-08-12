@@ -706,11 +706,34 @@ export async function sendCampaignEmailServer(data: {
       return { success: true, count: 0 };
     }
 
+    // 1. Create the campaign document in Sanity first to obtain the campaign ID for tracking tags
+    const currentMonthYearShort = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const campaignDoc = {
+      _type: 'campaign',
+      title: data.subject,
+      sentDate: currentMonthYearShort,
+      recipients: activeSubscribers.length,
+      openRate: "0.0%",
+      clickRate: "0.0%",
+      openedBy: [],
+      clickedBy: []
+    };
+
+    const createdCampaign = await sanityWriteClient.create(campaignDoc);
+    const campaignId = createdCampaign._id;
+
+    // 2. Transmit campaign emails to all active list accounts tagged with the campaign ID
     for (const sub of activeSubscribers) {
       await resend.emails.send({
         from: 'Ariane Rugumaho <hello@rugumaho.com>',
         to: sub.email,
         subject: data.subject || "The Weekly Muse",
+        tags: [
+          {
+            name: 'campaign_id',
+            value: campaignId
+          }
+        ],
         html: `
           <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #f1f5f9; border-radius: 16px; background-color: #ffffff; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
             <div style="background-color: #0f172a; height: 6px; width: 100%;"></div>
@@ -758,7 +781,7 @@ export async function sendCampaignEmailServer(data: {
     }
 
     console.log(`Successfully sent campaign newsletter to ${activeSubscribers.length} subscribers via Resend.`);
-    return { success: true, count: activeSubscribers.length };
+    return { success: true, id: campaignId, count: activeSubscribers.length };
   } catch (err: any) {
     console.error("Failed to send campaign newsletter email:", err);
     return { success: false, error: err.message || "Failed to deliver campaign messages." };

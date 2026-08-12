@@ -443,16 +443,6 @@ export default function ComposeNewsletterPage() {
       });
 
       if (emailRes.success) {
-        const currentMonthYear = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-        
-        await addCampaign({
-          title: subject,
-          sentDate: currentMonthYear,
-          recipients: subscribersCount,
-          openRate: "0.0%",
-          clickRate: "0.0%"
-        });
-
         triggerToast("Newsletter sent successfully!");
         setTimeout(() => {
           router.push("/admin/newsletter");
