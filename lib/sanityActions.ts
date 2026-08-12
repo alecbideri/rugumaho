@@ -242,6 +242,27 @@ export async function deleteSubscriberServer(id: string) {
   }
 }
 
+export async function unsubscribeByEmailServer(email: string) {
+  try {
+    const query = `*[_type == "subscriber" && email == $email][0]._id`;
+    const docId = await sanityWriteClient.fetch(query, { email });
+    
+    if (!docId) {
+      return { success: false, error: "We couldn't find a subscriber with that email address." };
+    }
+
+    await sanityWriteClient
+      .patch(docId)
+      .set({ status: "Unsubscribed" })
+      .commit();
+      
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error unsubscribing by email in Sanity:", error);
+    return { success: false, error: error.message || "Failed to process unsubscribe request." };
+  }
+}
+
 // --- Campaign Actions ---
 
 export async function addCampaignServer(campaign: CampaignData) {
@@ -729,7 +750,7 @@ export async function sendCampaignEmailServer(data: {
               <p style="font-size: 12px; color: #64748b; margin: 0 0 16px 0; line-height: 1.5;">
                 You're receiving this because you're part of the Rugumaho community.
               </p>
-              <a href="https://rugumaho.com" style="font-size: 12px; color: #0f172a; font-weight: bold; text-decoration: underline;">Unsubscribe</a>
+              <a href="https://rugumaho.com/unsubscribe?email=${encodeURIComponent(sub.email)}" style="font-size: 12px; color: #0f172a; font-weight: bold; text-decoration: underline;">Unsubscribe</a>
             </div>
           </div>
         `
