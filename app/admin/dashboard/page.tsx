@@ -215,8 +215,8 @@ export default function AdminDashboard() {
               <h3 className="text-3xl font-bold text-slate-900">
                 {mounted ? subscribersCount : "-"}
               </h3>
-              <span className="text-slate-450 text-xs font-semibold bg-slate-50 px-2.5 py-1 rounded">
-                Pending Setup
+              <span className="text-emerald-500 text-xs font-semibold bg-emerald-50 px-2.5 py-1 rounded">
+                Active List
               </span>
             </div>
           </div>

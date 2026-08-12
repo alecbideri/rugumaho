@@ -65,7 +65,6 @@ export default function AdminNewsletterPage() {
   const [selectedReportCampaign, setSelectedReportCampaign] = useState<Campaign | null>(null);
   
   // Search & Pagination States
-  const [globalSearch, setGlobalSearch] = useState("");
   const [subSearch, setSubSearch] = useState("");
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
@@ -92,16 +91,16 @@ export default function AdminNewsletterPage() {
   // Reset page when search changes
   useEffect(() => {
     setPage(1);
-  }, [subSearch, globalSearch]);
+  }, [subSearch]);
 
   const triggerToast = (message: string) => {
     setShowToast(message);
     setTimeout(() => setShowToast(null), 3000);
   };
 
-  // Filter subscribers based on local input or global search
+  // Filter subscribers based on local input
   const filteredSubscribers = subscribers.filter(s => {
-    const query = (subSearch || globalSearch).toLowerCase();
+    const query = subSearch.toLowerCase();
     return (
       s.name.toLowerCase().includes(query) ||
       s.email.toLowerCase().includes(query)
@@ -168,16 +167,6 @@ export default function AdminNewsletterPage() {
       <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
         <h2 className="font-serif text-3xl font-bold">Newsletter</h2>
         <div className="flex items-center gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4.5 h-4.5" />
-            <input 
-              value={globalSearch}
-              onChange={(e) => setGlobalSearch(e.target.value)}
-              className="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-slate-100" 
-              placeholder="Global search..." 
-              type="text"
-            />
-          </div>
           <Link 
             href="/admin/newsletter/new"
             className="bg-primary hover:bg-primary/90 text-white dark:text-slate-900 font-bold px-6 py-2 rounded-lg transition-all flex items-center gap-2 cursor-pointer"
