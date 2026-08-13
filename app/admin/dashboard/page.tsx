@@ -22,6 +22,7 @@ import {
 export default function AdminDashboard() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [showAllPosts, setShowAllPosts] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
   const [settings, setSettings] = useState<BlogSettings>({ heroLayout: 'carousel' });
   const [pendingComments, setPendingComments] = useState<BlogComment[]>([]);
@@ -251,7 +252,14 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                 <h4 className="font-serif text-xl font-bold text-slate-800">Recent Posts</h4>
-                <Link className="text-primary text-sm font-semibold hover:underline" href="#">View All</Link>
+                {posts.length > 3 && (
+                  <button 
+                    onClick={() => setShowAllPosts(!showAllPosts)} 
+                    className="text-primary text-sm font-semibold hover:underline cursor-pointer bg-transparent border-none"
+                  >
+                    {showAllPosts ? "Show Less" : "View All"}
+                  </button>
+                )}
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[500px]">
@@ -272,7 +280,7 @@ export default function AdminDashboard() {
                         </td>
                       </tr>
                     ) : (
-                      mounted && posts.slice(0, 3).map((post) => (
+                      mounted && (showAllPosts ? posts : posts.slice(0, 3)).map((post) => (
                         <tr key={post.id} className="hover:bg-slate-50 transition-colors">
                           {/* Title and Date */}
                           <td className="px-6 py-4">
