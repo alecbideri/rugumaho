@@ -1,6 +1,6 @@
 # Rugumaho Blog & Lifestyle Journal
 
-A premium, high-performance personal journal, lifestyle blog, and email newsletter platform built for **Ariane Rugumaho**. 
+A premium, high-performance personal journal, lifestyle blog, and email newsletter platform built for **Ariane Rugumaho**.
 
 This repository houses the complete codebase, featuring dynamic serverless API routing, email campaign triggers, comment moderation workflows, and progressive image loader structures.
 
