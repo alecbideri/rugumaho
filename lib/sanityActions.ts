@@ -442,6 +442,20 @@ export async function deleteCommentServer(id: string) {
   }
 }
 
+export async function likeCommentServer(id: string) {
+  try {
+    await sanityWriteClient
+      .patch(id)
+      .setIfMissing({ likes: 0 })
+      .inc({ likes: 1 })
+      .commit();
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error liking comment in Sanity:", error);
+    return { success: false, error: error.message };
+  }
+}
+
 export async function incrementPostViewsServer(slug: string) {
   try {
     const post = await sanityWriteClient.fetch(

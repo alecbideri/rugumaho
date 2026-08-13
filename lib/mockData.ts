@@ -19,7 +19,8 @@ import {
   deleteCommentServer,
   incrementPostViewsServer,
   sendNewsletterTestEmailServer,
-  sendCampaignEmailServer
+  sendCampaignEmailServer,
+  likeCommentServer
 } from './sanityActions';
 
 export interface Post {
@@ -223,4 +224,8 @@ export async function sendCampaignEmail(data: {
   ctaPostLink: string;
 }) {
   return sendCampaignEmailServer(data);
+}
+
+export async function likeComment(id: string) {
+  return likeCommentServer(id);
 }

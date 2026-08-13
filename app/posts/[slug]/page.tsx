@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
-import { getPostBySlug, getPosts, Post, getApprovedComments, addComment, incrementPostViews } from "../../../lib/mockData";
+import { getPostBySlug, getPosts, Post, getApprovedComments, addComment, incrementPostViews, likeComment } from "../../../lib/mockData";
 import { 
   Calendar, 
   User, 
@@ -93,6 +93,20 @@ export default function BlogPostPage({ params }: PageProps) {
 
   const [toast, setToast] = useState<string | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [likedComments, setLikedComments] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("rugumaho_liked_comments");
+      if (stored) {
+        try {
+          setLikedComments(JSON.parse(stored));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+  }, []);
   const [isInstagramModalOpen, setIsInstagramModalOpen] = useState(false);
 
   const triggerToast = (msg: string) => {
@@ -296,20 +310,35 @@ export default function BlogPostPage({ params }: PageProps) {
   };
 
   const handleLikeComment = (commentId: string) => {
+    if (likedComments.includes(commentId)) {
+      // Prevent multiple likes per user session
+      return;
+    }
+
     setComments(prev => 
       prev.map(c => {
         if (c.id === commentId) {
-          return { ...c, likes: c.likes + 1 };
+          return { ...c, likes: (c.likes || 0) + 1 };
         }
         if (c.replies) {
           return {
             ...c,
-            replies: c.replies.map(r => r.id === commentId ? { ...r, likes: r.likes + 1 } : r)
+            replies: c.replies.map(r => r.id === commentId ? { ...r, likes: (r.likes || 0) + 1 } : r)
           };
         }
         return c;
       })
     );
+
+    // Save liked comment ID in localStorage to prevent repeat clicking
+    const updated = [...likedComments, commentId];
+    setLikedComments(updated);
+    localStorage.setItem("rugumaho_liked_comments", JSON.stringify(updated));
+
+    // Save likes permanently in the Sanity database
+    likeComment(commentId).catch((err) => {
+      console.error("Failed to save like permanently in Sanity:", err);
+    });
   };
 
   // Simple Markdown parsing for formatting paragraphs, headings, blockquotes, lists

@@ -77,7 +77,9 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the l
 ## 🔑 Administrative Control Panel
 
 The admin dashboard is fully secure and can be accessed at:
-`/admin/login?key=ariane-secret-token`
+* **URL**: [rugumaho.com/admin/login?key=ariane-secret-token](https://rugumaho.com/admin/login?key=ariane-secret-token)
+* **Master Username**: `arianebloger@gmail.com` (or `arianebloger`)
+* **Master Password**: `Ariane200@.`
 
 * **Dashboard**: Track views, moderate comments, and view active lists.
 * **Compose Campaign**: Send custom HTML rich-text newsletters (teasers, CTAs, hero graphics) to your active list.
@@ -87,7 +89,8 @@ The admin dashboard is fully secure and can be accessed at:
 
 ## 📦 Reference Guides & Handover
 
-We have compiled two dedicated PDF guides in the root directory for easy download and handover:
+We have compiled three dedicated PDF guides in the root directory for easy download and handover:
 
 1. **[Technical Handover Guide (PDF)](file:///c:/Users/BIDERI%20ALEC/Downloads/Projects/For%20normal%20businesses/Ariane/rugumaho%20blog/Rugumaho_Project_Handover_Guide.pdf)**: Detailed breakdown of the cloud service accounts, free tier limits (such as Resend's 100 emails/day cap), and instructions on when and how to scale plans.
 2. **[SEO & Audience Growth Guide (PDF)](file:///c:/Users/BIDERI%20ALEC/Downloads/Projects/For%20normal%20businesses/Ariane/rugumaho%20blog/Rugumaho_Organic_SEO_Growth_Guide.pdf)**: Best practices for writing search-engine-friendly headlines, bridging Substack, and leveraging YouTube/Vlogs for traffic growth.
+3. **[Credentials Handover Guide (PDF)](file:///c:/Users/BIDERI%20ALEC/Downloads/Projects/For%20normal%20businesses/Ariane/rugumaho%20blog/Rugumaho_Credentials_Handover_Guide.pdf)**: Confidential login sheet containing the exact account credentials for all connected services.
