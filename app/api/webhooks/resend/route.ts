@@ -16,12 +16,29 @@ export async function POST(request: Request) {
     const payload = await request.json();
     const eventType = payload.type; // "email.opened" or "email.clicked"
     const data = payload.data || {};
-    const tags = data.tags || {};
-    const campaignId = tags.campaign_id;
-    const recipientEmails = data.to || [];
-    const recipientEmail = recipientEmails[0]; // The recipient email address
+    
+    // Extract campaign_id from Resend tags array
+    const tags = data.tags || [];
+    let campaignId = null;
+    if (Array.isArray(tags)) {
+      const campaignTag = tags.find((t: any) => t.name === "campaign_id");
+      if (campaignTag) {
+        campaignId = campaignTag.value;
+      }
+    } else if (typeof tags === "object" && tags !== null) {
+      campaignId = (tags as any).campaign_id;
+    }
+
+    // Extract recipient email address
+    let recipientEmail = "";
+    if (Array.isArray(data.to)) {
+      recipientEmail = data.to[0] || "";
+    } else if (typeof data.to === "string") {
+      recipientEmail = data.to;
+    }
 
     if (!campaignId || !recipientEmail) {
+      console.warn(`Ignored webhook event: campaignId=${campaignId}, recipientEmail=${recipientEmail}`);
       return NextResponse.json({ message: "No campaign ID or recipient found in payload. Ignored." }, { status: 200 });
     }
 

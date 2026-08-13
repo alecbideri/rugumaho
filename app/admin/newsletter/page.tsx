@@ -60,7 +60,7 @@ const INITIAL_CAMPAIGNS: Campaign[] = [
 ];
 
 export default function AdminNewsletterPage() {
-  const [subscribers, setSubscribers] = useState<Subscriber[]>(INITIAL_SUBSCRIBERS);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [selectedReportCampaign, setSelectedReportCampaign] = useState<Campaign | null>(null);
   
@@ -92,6 +92,19 @@ export default function AdminNewsletterPage() {
   useEffect(() => {
     setPage(1);
   }, [subSearch]);
+
+  // Close active dropdown when clicking outside
+  useEffect(() => {
+    if (!activeDropdown) return;
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".dropdown-container")) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener("click", handleOutsideClick);
+    return () => document.removeEventListener("click", handleOutsideClick);
+  }, [activeDropdown]);
 
   const triggerToast = (message: string) => {
     setShowToast(message);
@@ -288,7 +301,7 @@ export default function AdminNewsletterPage() {
                           {sub.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right relative">
+                      <td className="px-6 py-4 text-right relative dropdown-container">
                         <button 
                           onClick={() => setActiveDropdown(activeDropdown === sub.id ? null : sub.id)}
                           className="text-slate-400 hover:text-slate-900 dark:hover:text-white p-1 rounded transition-colors cursor-pointer"
@@ -298,12 +311,7 @@ export default function AdminNewsletterPage() {
                         
                         {/* Dropdown Options */}
                         {activeDropdown === sub.id && (
-                          <>
-                            <div 
-                              onClick={() => setActiveDropdown(null)}
-                              className="fixed inset-0 z-20"
-                            />
-                            <div className="absolute right-6 top-10 w-44 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-lg py-1 z-30 animate-in fade-in slide-in-from-top-1 duration-150">
+                          <div className="absolute right-6 top-10 w-44 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-lg py-1 z-30 animate-in fade-in slide-in-from-top-1 duration-150">
                               <button
                                 onClick={() => toggleSubscriberStatus(sub.id, sub.status)}
                                 className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-medium text-slate-700 dark:text-slate-200 flex items-center gap-2"
@@ -319,7 +327,6 @@ export default function AdminNewsletterPage() {
                                 Remove Subscriber
                               </button>
                             </div>
-                          </>
                         )}
                       </td>
                     </tr>
