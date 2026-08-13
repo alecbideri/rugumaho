@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="850 550 100 100" width="100%" height="100%">
+  <circle cx="900" cy="600" r="46" fill="#0F172A" />
+  <g fill="#A88F6D" fill-rule="evenodd">
+    {/* U-mount stand */}
+    <path d="M 870 595 A 30 30 0 0 0 930 595 L 935 595 L 935 590 L 925 590 L 925 595 A 20 20 0 0 1 875 595 L 875 590 L 865 590 Z" />
+    {/* Stem and base stand */}
+    <path d="M 897 618 L 897 635 L 885 635 L 885 640 L 915 640 L 915 635 L 903 635 L 903 618 Z" />
+    {/* Microphone capsule */}
+    <path d="M 885 570 C 885 560, 915 560, 915 570 L 915 595 C 915 605, 885 605, 885 595 Z" />
+    {/* Capsule horizontal ribs */}
+    <path d="M 888 575 L 912 575 L 912 578 L 888 578 Z M 888 583 L 912 583 L 912 586 L 888 586 Z M 888 591 L 912 591 L 912 594 L 888 594 Z M 888 597 L 912 597 L 912 600 L 888 600 Z" />
+  </g>
+</svg>
