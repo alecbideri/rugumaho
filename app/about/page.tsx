@@ -58,21 +58,45 @@ export default function AboutPage() {
             <div className="w-12 h-1 bg-primary mb-4"></div>
             <span className="text-xs font-extrabold uppercase tracking-widest text-primary mb-2">Meet the Founder</span>
             <h2 className="font-serif text-4xl sm:text-5xl font-bold text-slate-900 mb-6 leading-tight">
-              The Story Behind Rugumaho
+              About
             </h2>
             <div className="text-slate-600 leading-relaxed text-base space-y-6 font-light">
               <p>
-                My journey began with a simple idea: to celebrate authentic human connection in a world that often feels disconnected. &ldquo;Rugumaho&rdquo; means to endure and remain present, but for me, it represents the intentionality behind every shared story and handcrafted detail.
+                Ikaze! I’m Rugumaho. My name means &ldquo;it remains,&rdquo; and in Rwandan culture, names are believed to reflect who we are. My name has inspired me to live with intention, presence, and purpose.
               </p>
               <p>
-                What started as a personal journal has blossomed into a collective dedicated to mindful living. I believe that the objects I surround myself with and the stories I tell shape the essence of my daily life.
+                I am guided by Ubuntu, an African concept that means &ldquo;I am because you are.&rdquo; It reminds me that we are deeply connected and that each of us is shaped by the wider community around us.
               </p>
-              <p>
-                Through this space, I invite you to explore the beauty of the slow and the meaningful. Every piece of content, every curated item, is a reflection of my passion for purpose-driven, heart-led living.
+              
+              <div className="pt-2">
+                <h3 className="font-serif font-bold text-lg text-slate-800 mb-3">What Inspires Me</h3>
+                <ul className="space-y-2.5 list-none pl-0">
+                  <li className="flex items-start gap-2 text-slate-600">
+                    <span className="text-primary font-bold text-base">&bull;</span>
+                    <span><strong>People:</strong> the relationships and communities that shape who we are.</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-slate-600">
+                    <span className="text-primary font-bold text-base">&bull;</span>
+                    <span><strong>Places:</strong> the journeys and experiences that broaden our perspective.</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-slate-600">
+                    <span className="text-primary font-bold text-base">&bull;</span>
+                    <span><strong>Playlists:</strong> the sounds that hold memories, meaning, and emotion.</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-slate-600">
+                    <span className="text-primary font-bold text-base">&bull;</span>
+                    <span><strong>Plates:</strong> the foods and flavours that bring people together.</span>
+                  </li>
+                </ul>
+              </div>
+
+              <p className="pt-2">
+                I hope these stories resonate with you, offer moments of reflection, and add meaningful value to your life.
               </p>
 
-              <span className="font-serif italic text-lg text-slate-800 mt-6 block">
-                &mdash; Ariane Rugumaho
+              <span className="font-serif italic text-lg text-slate-850 mt-4 block">
+                With love,<br/>
+                Rugumaho
               </span>
             </div>
           </div>
@@ -83,7 +107,7 @@ export default function AboutPage() {
           <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-8 md:p-12 text-center relative shadow-sm">
             <span className="text-slate-350 text-6xl font-serif leading-none mb-4 block select-none">&ldquo;</span>
             <blockquote className="font-serif text-2xl sm:text-3xl italic text-slate-800 leading-relaxed max-w-2xl mx-auto">
-              To inspire meaningful lives through the power of authentic storytelling and community-driven inspiration, fostering a global culture of intentionality.
+              I aim to encourage purposeful living through authentic storytelling and community-rooted inspiration.
             </blockquote>
           </div>
         </section>
@@ -103,7 +127,7 @@ export default function AboutPage() {
               </div>
               <h4 className="font-serif text-xl font-bold text-slate-900 mb-3">Authenticity</h4>
               <p className="text-slate-500 font-light text-sm leading-relaxed">
-                I believe in being true to ourselves and our community, honoring real stories over fleeting trends.
+                sharing honest stories and reflections rooted in lived experience.
               </p>
             </div>
 
@@ -114,7 +138,7 @@ export default function AboutPage() {
               </div>
               <h4 className="font-serif text-xl font-bold text-slate-900 mb-3">Inspiration</h4>
               <p className="text-slate-500 font-light text-sm leading-relaxed">
-                Sparking curiosity and encouraging a more intentional, thoughtful approach to daily life and personal creativity.
+                encouraging purposeful, heart-led living through meaningful ideas and moments.
               </p>
             </div>
 
@@ -125,7 +149,7 @@ export default function AboutPage() {
               </div>
               <h4 className="font-serif text-xl font-bold text-slate-900 mb-3">Community</h4>
               <p className="text-slate-500 font-light text-sm leading-relaxed">
-                Fostering warm spaces where individuals can connect, share meaningful conversations, and grow together.
+                creating spaces for connection, learning, and shared growth.
               </p>
             </div>
           </div>
