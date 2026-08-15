@@ -65,8 +65,8 @@ export default function Logo({ className = "h-10 w-auto", animate = false }: Log
       </defs>
 
       <g fill="currentColor" fillRule="evenodd">
-        {/* Animated Podcast Microphone (v1) */}
-        <g>
+        {/* Animated Podcast Microphone (v1) in gold brown */}
+        <g fill="#A88F6D">
           {/* U-mount stand */}
           <path d="M 870 595 A 30 30 0 0 0 930 595 L 935 595 L 935 590 L 925 590 L 925 595 A 20 20 0 0 1 875 595 L 875 590 L 865 590 Z" />
           {/* Stem and base stand */}
@@ -81,7 +81,7 @@ export default function Logo({ className = "h-10 w-auto", animate = false }: Log
             className={`svg-wave-inner ${animate ? "animate-wave-pulse" : "opacity-0"}`} 
             d="M 872 572 A 15 15 0 0 0 872 598 M 928 572 A 15 15 0 0 1 928 598" 
             fill="none" 
-            stroke="currentColor" 
+            stroke="#A88F6D" 
             strokeWidth="3" 
             strokeLinecap="round" 
           />
@@ -89,7 +89,7 @@ export default function Logo({ className = "h-10 w-auto", animate = false }: Log
             className={`svg-wave-outer ${animate ? "animate-wave-pulse-delayed" : "opacity-0"}`} 
             d="M 862 562 A 30 30 0 0 0 862 608 M 938 562 A 30 30 0 0 1 938 608" 
             fill="none" 
-            stroke="currentColor" 
+            stroke="#A88F6D" 
             strokeWidth="3" 
             strokeLinecap="round" 
           />
