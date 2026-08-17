@@ -44,8 +44,9 @@ body {
 }
 
 /* WYSIWYG Content Formatting Output Classes */
-.wysiwyg-content {
-  font-family: var(--font-serif), serif;
+.wysiwyg-content,
+.wysiwyg-content * {
+  font-family: var(--font-serif), serif !important;
 }
 
 .wysiwyg-content h2 {
