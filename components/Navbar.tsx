@@ -169,7 +169,7 @@ export default function Navbar() {
                           )}
                           <div className="min-w-0 flex-1">
                             <span className="inline-block text-[9px] font-extrabold uppercase tracking-wider text-primary group-hover:text-white transition-colors mb-0.5">
-                              {post.category}
+                              {post.category === "Fitness" ? "Wellbeing" : post.category}
                             </span>
                             <p className="text-xs font-bold text-slate-900 group-hover:text-white transition-colors truncate">
                               {post.title}
@@ -290,7 +290,7 @@ export default function Navbar() {
                         )}
                         <div className="min-w-0 flex-1">
                           <span className="inline-block text-[9px] font-extrabold uppercase tracking-wider text-primary group-hover:text-white transition-colors mb-0.5">
-                            {post.category}
+                            {post.category === "Fitness" ? "Wellbeing" : post.category}
                           </span>
                           <p className="text-xs font-bold text-slate-900 group-hover:text-white transition-colors truncate">
                             {post.title}

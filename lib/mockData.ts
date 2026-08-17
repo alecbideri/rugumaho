@@ -30,7 +30,7 @@ export interface Post {
   excerpt: string;
   content: string;
   coverImage?: string;
-  category?: 'Motherhood' | 'Travel' | 'Fitness' | 'Lifestyle';
+  category?: 'Motherhood' | 'Travel' | 'Fitness' | 'Lifestyle' | 'Wellbeing';
   tags?: string[];
   author: string;
   status: 'draft' | 'published';

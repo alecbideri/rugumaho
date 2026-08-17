@@ -56,13 +56,10 @@ export default function AboutPage() {
           {/* Right Column: Biography content */}
           <div className="flex flex-col justify-center">
             <div className="w-12 h-1 bg-primary mb-4"></div>
-            <span className="text-xs font-extrabold uppercase tracking-widest text-primary mb-2">Meet the Founder</span>
-            <h2 className="font-serif text-4xl sm:text-5xl font-bold text-slate-900 mb-6 leading-tight">
-              About
-            </h2>
+            <span className="text-xs font-extrabold uppercase tracking-widest text-primary mb-6">Meet the Founder</span>
             <div className="text-slate-600 leading-relaxed text-base space-y-6 font-light">
               <p>
-                Ikaze! I’m Rugumaho. My name means &ldquo;it remains,&rdquo; and in Rwandan culture, names are believed to reflect who we are. My name has inspired me to live with intention, presence, and purpose.
+                Ikaze! I’m Rugumaho. My name means &ldquo;it remains present,&rdquo; and in Rwandan culture, names are believed to reflect who we are.
               </p>
               <p>
                 I am guided by Ubuntu, an African concept that means &ldquo;I am because you are.&rdquo; It reminds me that we are deeply connected and that each of us is shaped by the wider community around us.
@@ -91,7 +88,7 @@ export default function AboutPage() {
               </div>
 
               <p className="pt-2">
-                I hope these stories resonate with you, offer moments of reflection, and add meaningful value to your life.
+                I hope the stories you find here resonate with you, offer moments of reflection, and add meaningful value to your life.
               </p>
 
               <span className="font-serif italic text-lg text-slate-850 mt-4 block">
@@ -105,9 +102,8 @@ export default function AboutPage() {
         {/* Mission Quote Card */}
         <section className="max-w-3xl mx-auto w-full px-2">
           <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-8 md:p-12 text-center relative shadow-sm">
-            <span className="text-slate-350 text-6xl font-serif leading-none mb-4 block select-none">&ldquo;</span>
             <blockquote className="font-serif text-2xl sm:text-3xl italic text-slate-800 leading-relaxed max-w-2xl mx-auto">
-              I aim to encourage purposeful living through authentic storytelling and community-rooted inspiration.
+              &ldquo;I aim to encourage purposeful living through authentic storytelling and community-rooted inspiration.&rdquo;
             </blockquote>
           </div>
         </section>

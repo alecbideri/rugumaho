@@ -487,7 +487,7 @@ export default function BlogPostPage({ params }: PageProps) {
         <header className="mx-auto flex max-w-3xl flex-col items-center text-center">
           {post.category && (
             <span className="inline-block rounded-full bg-primary/20 px-4 py-1 text-xs font-bold uppercase tracking-widest text-primary">
-              {post.category}
+              {post.category === "Fitness" ? "Wellbeing" : post.category}
             </span>
           )}
           

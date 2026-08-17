@@ -537,23 +537,24 @@ async function sendWelcomeEmail(email: string, name?: string) {
   try {
     const resend = new Resend(apiKey);
     await resend.emails.send({
-      from: 'Ariane Rugumaho <hello@rugumaho.com>',
+      from: 'Urukundo Rugumaho <hello@rugumaho.com>',
       to: email,
-      subject: 'Welcome to the Inner Circle | Rugumaho',
+      subject: 'Welcome to the blog!',
       html: `
         <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 580px; margin: 0 auto; padding: 32px 24px; border: 1px solid #f1f5f9; border-radius: 16px; background-color: #ffffff;">
           <div style="text-align: center; margin-bottom: 32px; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px;">
             <h1 style="font-family: Georgia, serif; font-size: 28px; font-weight: bold; color: #0f172a; margin: 0 0 8px 0; letter-spacing: -0.5px;">RUGUMAHO</h1>
-            <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: #64748b; margin: 0; font-weight: 700;">Inner Circle</p>
+            <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: #64748b; margin: 0; font-weight: 700;">Blog</p>
           </div>
           
           <div style="font-size: 15px; color: #334155; line-height: 1.8; margin-bottom: 32px;">
-            <p>Hello${name ? ` ${name}` : ''},</p>
-            <p>Thank you for subscribing to my personal journal list. I am thrilled to welcome you to this corner of the web.</p>
-            <p>Going forward, you will receive weekly updates containing personal essays, travel notes from quiet corners of the world, and insights into active lifestyle & wellness.</p>
-            <p>I look forward to sharing these stories with you.</p>
+            <p>Hi there,</p>
+            <p>Thank you so much for subscribing to the blog! I am thrilled to have you here.</p>
+            <p>You will be among the first to receive new posts, insights, and updates delivered straight to your inbox.</p>
+            <p>I hope you find something useful, inspiring, or simply enjoyable in every issue.</p>
+            <p>Thank you for joining me on this journey!</p>
             <p style="margin-top: 24px; border-left: 3px solid #0f172a; padding-left: 12px; font-style: italic; color: #475569;">
-              Warmly,<br/><strong>Ariane Rugumaho</strong>
+              With love,<br/><strong>Urukundo Rugumaho</strong>
             </p>
           </div>
           

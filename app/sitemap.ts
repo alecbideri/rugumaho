@@ -11,7 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  const categoryUrls = ["motherhood", "travel", "fitness", "lifestyle"].map((cat) => ({
+  const categoryUrls = ["motherhood", "travel", "wellbeing", "lifestyle"].map((cat) => ({
     url: `https://rugumaho.com/category/${cat}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,

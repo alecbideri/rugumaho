@@ -49,7 +49,7 @@ function NewPostEditor() {
   // State bindings
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [category, setCategory] = useState<"Travel" | "Motherhood" | "Fitness" | "Lifestyle">("Travel");
+  const [category, setCategory] = useState<"Travel" | "Motherhood" | "Fitness" | "Wellbeing" | "Lifestyle">("Travel");
   const [tags, setTags] = useState<string[]>(["Adventure", "Story"]);
   const [tagInput, setTagInput] = useState("");
   const [coverImage, setCoverImage] = useState("https://lh3.googleusercontent.com/aida-public/AB6AXuBhvB0y0uOyIw_p3KdqF7An70gEZQR_bAcTwuFngKFm0tTd-haobprSnkTwQY5sxtcWlxkB8B_5vnfdRKv1VfbRpt3O07I9FvZn5Y47iYVhREULiYpAxmOfOGAAeS-mZziLUwxPEdV8cETi41yjBBhx7XSXTilH4WUDHrpcBqH7HGOQZQo5wYYpmzUsj5vhJ0MuaFLM84O9903gA1qM7vfSy7OIs1rGZTOqdg4D4jAdXdezG4sE6E-fSS_8o8r4hOL-uuxz8YiCTaw");
@@ -771,7 +771,7 @@ function NewPostEditor() {
               >
                 <option value="Travel">Travel</option>
                 <option value="Motherhood">Motherhood</option>
-                <option value="Fitness">Fitness &amp; Wellness</option>
+                <option value="Wellbeing">Wellbeing</option>
                 <option value="Lifestyle">Lifestyle</option>
               </select>
             </div>
@@ -953,7 +953,7 @@ function NewPostEditor() {
             <div className="flex-1 overflow-y-auto p-8 md:p-12 space-y-6">
               {/* Category */}
               <div className="text-xs font-bold uppercase tracking-wider text-primary">
-                {category === "Fitness" ? "Fitness & Wellness" : category}
+                {category === "Fitness" || category === "Wellbeing" ? "Wellbeing" : category}
               </div>
               
               {/* Title */}

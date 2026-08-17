@@ -62,7 +62,7 @@ interface CategoryConfig {
 
 const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   all: {
-    tagline: "Exploring the world's quiet corners, active fitness, motherhood, and premium lifestyles.",
+    tagline: "Exploring stories on Lifestyle, motherhood, Travel and more.",
     coverImage: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1200&q=80"
   },
   motherhood: {
@@ -72,6 +72,10 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   travel: {
     tagline: "Exploring the world's quiet corners with heart and purpose.",
     coverImage: "/covers/travel_category.png"
+  },
+  wellbeing: {
+    tagline: "Strength, endurance, and physical health for a vibrant lifestyle.",
+    coverImage: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1200&q=80"
   },
   fitness: {
     tagline: "Strength, endurance, and physical health for a vibrant lifestyle.",
@@ -95,7 +99,10 @@ interface PageProps {
 export default function CategoryPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const rawCategory = resolvedParams.category;
-  const categoryName = rawCategory.toLowerCase() === "all" ? "Explore" : rawCategory.charAt(0).toUpperCase() + rawCategory.slice(1).toLowerCase();
+  let categoryName = rawCategory.toLowerCase() === "all" ? "Explore" : rawCategory.charAt(0).toUpperCase() + rawCategory.slice(1).toLowerCase();
+  if (categoryName.toLowerCase() === "fitness") {
+    categoryName = "Wellbeing";
+  }
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [allCategoryPosts, setAllCategoryPosts] = useState<Post[]>([]);
@@ -119,10 +126,17 @@ export default function CategoryPage({ params }: PageProps) {
     getPosts().then((fetched) => {
       const all = fetched.filter(p => p.status === "published");
       
-      // Filter by category
+      // Filter by category (group fitness and wellbeing together)
       let categoryFiltered = rawCategory.toLowerCase() === "all"
         ? all
-        : all.filter(p => p.category?.toLowerCase() === rawCategory.toLowerCase());
+        : all.filter(p => {
+            const cat = p.category?.toLowerCase();
+            const target = rawCategory.toLowerCase();
+            if (target === "wellbeing" || target === "fitness") {
+              return cat === "wellbeing" || cat === "fitness";
+            }
+            return cat === target;
+          });
         
       // Filter by search query if present in URL
       let searchVal = "";
@@ -291,7 +305,7 @@ export default function CategoryPage({ params }: PageProps) {
           {[
             { name: "Motherhood", path: "motherhood" },
             { name: "Travel", path: "travel" },
-            { name: "Fitness", path: "fitness" },
+            { name: "Wellbeing", path: "wellbeing" },
             { name: "Lifestyle", path: "lifestyle" }
           ].map((cat) => {
             const isActive = rawCategory.toLowerCase() === cat.path;
@@ -507,7 +521,7 @@ export default function CategoryPage({ params }: PageProps) {
               <div className="bg-slate-50 p-8 rounded-xl border border-slate-100 mb-12">
                 <h4 className="font-serif text-xl mb-2 italic text-slate-800">Inner Circle</h4>
                 <p className="text-sm text-slate-500 mb-6 leading-relaxed">
-                  Weekly {rawCategory} insights and personal essays delivered to your inbox.
+                  New posts, insights, and updates delivered straight to your inbox.
                 </p>
                 {subscribed ? (
                   <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-lg text-xs font-semibold text-center">

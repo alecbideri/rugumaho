@@ -140,6 +140,7 @@ export default function AdminDashboard() {
       case "Travel":
         return "bg-amber-100 text-amber-700";
       case "Fitness":
+      case "Wellbeing":
         return "bg-emerald-100 text-emerald-700";
       case "Motherhood":
         return "bg-indigo-100 text-indigo-700";

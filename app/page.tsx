@@ -385,7 +385,7 @@ export default function Home() {
                 </h2>
                 
                 <p className="text-slate-600 dark:text-slate-300 text-base md:text-lg max-w-lg">
-                  Receive a weekly curation of our best stories, wellness tips, and exclusive lifestyle guides directly to your inbox. No spam, just inspiration.
+                  Sign up with your email address to receive stories and updates directly to your inbox.
                 </p>
 
                 {subscribed ? (
