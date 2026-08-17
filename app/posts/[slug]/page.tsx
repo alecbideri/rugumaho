@@ -531,7 +531,7 @@ export default function BlogPostPage({ params }: PageProps) {
         )}
 
         {/* Article Body Content */}
-        <article className="mx-auto mt-16 max-w-[680px] text-lg leading-[1.8] text-slate-700">
+        <article className="mx-auto mt-16 max-w-[680px] text-lg leading-[1.8] text-slate-700 font-serif">
           {post.content.trim().startsWith("<") || post.content.includes("</") ? (
             <div 
               className="wysiwyg-content text-slate-700 dark:text-slate-350"

@@ -44,6 +44,10 @@ body {
 }
 
 /* WYSIWYG Content Formatting Output Classes */
+.wysiwyg-content {
+  font-family: var(--font-serif), serif;
+}
+
 .wysiwyg-content h2 {
   font-family: var(--font-serif), serif;
   font-size: 1.875rem;
