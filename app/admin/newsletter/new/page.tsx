@@ -25,6 +25,7 @@ import {
   Quote
 } from "lucide-react";
 import { uploadImageToImageKit } from "../../../../lib/imagekitActions";
+import { compressImage } from "../../../../lib/imageCompression";
 import Logo from "@/components/Logo";
 
 export default function ComposeNewsletterPage() {
@@ -269,29 +270,25 @@ export default function ComposeNewsletterPage() {
 
     triggerToast("Uploading image to ImageKit...");
     try {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64 = reader.result as string;
-        const res = await uploadImageToImageKit(base64, file.name);
-        if (res.success && res.url) {
-          restoreCurrentSelection(uploadSelectionRef);
-          const imgHTML = `
-            <div class="my-6 text-center select-none" contenteditable="false">
-              <img src="${res.url}" class="rounded-xl max-h-[450px] object-cover w-full shadow-md animate-fade-in" alt="Newsletter image" />
-              <p class="text-xs text-slate-450 dark:text-slate-500 mt-2 font-serif italic border-none focus:outline-none" contenteditable="true">Write image caption...</p>
-            </div>
-            <p><br></p>
-          `;
-          formatText("insertHTML", imgHTML);
-          triggerToast("Image inserted successfully!");
-        } else {
-          alert("ImageKit upload failed: " + (res.error || "Unknown error"));
-        }
-      };
-      reader.readAsDataURL(file);
+      const base64 = await compressImage(file);
+      const res = await uploadImageToImageKit(base64, file.name);
+      if (res.success && res.url) {
+        restoreCurrentSelection(uploadSelectionRef);
+        const imgHTML = `
+          <div class="my-6 text-center select-none" contenteditable="false">
+            <img src="${res.url}" class="rounded-xl max-h-[450px] object-cover w-full shadow-md animate-fade-in" alt="Newsletter image" />
+            <p class="text-xs text-slate-450 dark:text-slate-500 mt-2 font-serif italic border-none focus:outline-none" contenteditable="true">Write image caption...</p>
+          </div>
+          <p><br></p>
+        `;
+        formatText("insertHTML", imgHTML);
+        triggerToast("Image inserted successfully!");
+      } else {
+        alert("ImageKit upload failed: " + (res.error || "Unknown error"));
+      }
     } catch (err: any) {
       console.error(err);
-      alert("Failed to read file: " + err.message);
+      alert("Failed to read and compress file: " + err.message);
     }
     e.target.value = "";
   };
@@ -350,21 +347,17 @@ export default function ComposeNewsletterPage() {
 
     triggerToast("Uploading cover image to ImageKit...");
     try {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64 = reader.result as string;
-        const res = await uploadImageToImageKit(base64, file.name);
-        if (res.success && res.url) {
-          setHeroImage(res.url);
-          triggerToast("Cover image set successfully!");
-        } else {
-          alert("ImageKit upload failed: " + (res.error || "Unknown error"));
-        }
-      };
-      reader.readAsDataURL(file);
+      const base64 = await compressImage(file);
+      const res = await uploadImageToImageKit(base64, file.name);
+      if (res.success && res.url) {
+        setHeroImage(res.url);
+        triggerToast("Cover image set successfully!");
+      } else {
+        alert("ImageKit upload failed: " + (res.error || "Unknown error"));
+      }
     } catch (err: any) {
       console.error(err);
-      alert("Failed to read file: " + err.message);
+      alert("Failed to read and compress file: " + err.message);
     }
     e.target.value = "";
   };
