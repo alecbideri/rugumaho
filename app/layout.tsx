@@ -13,8 +13,41 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Rugumaho - Modern Lifestyle Journal",
-  description: "Discover curated stories on lifestyle, travel, and wellness.",
+  metadataBase: new URL("https://rugumaho.com"),
+  title: {
+    default: "Rugumaho — A Journal of Life, Motherhood & Discovery",
+    template: "%s | Rugumaho"
+  },
+  description: "Reflections on lifestyle, motherhood, travel, and personal growth. Thoughtful stories crafted for readers who seek depth, presence, and meaningful connection.",
+  keywords: ["Rugumaho", "Ariane Rugumaho", "Lifestyle", "Motherhood", "Travel", "Wellbeing", "Slow Living", "Personal Growth", "Rwanda Journal"],
+  authors: [{ name: "Rugumaho", url: "https://rugumaho.com" }],
+  creator: "Rugumaho",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://rugumaho.com",
+    siteName: "Rugumaho",
+    title: "Rugumaho — A Journal of Life, Motherhood & Discovery",
+    description: "Reflections on lifestyle, motherhood, travel, and personal growth. Thoughtful stories crafted for readers who seek depth, presence, and meaningful connection.",
+    images: [
+      {
+        url: "/profile.png",
+        width: 1200,
+        height: 630,
+        alt: "Rugumaho — A Journal of Life, Motherhood & Discovery",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rugumaho — A Journal of Life, Motherhood & Discovery",
+    description: "Reflections on lifestyle, motherhood, travel, and personal growth. Thoughtful stories crafted for readers who seek depth, presence, and meaningful connection.",
+    images: ["/profile.png"],
+    creator: "@rugumaho",
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
