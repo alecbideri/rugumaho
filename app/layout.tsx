@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     default: "Rugumaho — A Journal of Life, Motherhood & Discovery",
     template: "%s | Rugumaho"
   },
-  description: "Reflections on lifestyle, motherhood, travel, and personal growth. Thoughtful stories crafted for readers who seek depth, presence, and meaningful connection.",
+  description: "Discover stories on lifestyle, travel and wellness",
   keywords: ["Rugumaho", "Ariane Rugumaho", "Lifestyle", "Motherhood", "Travel", "Wellbeing", "Slow Living", "Personal Growth", "Rwanda Journal"],
   authors: [{ name: "Rugumaho", url: "https://rugumaho.com" }],
   creator: "Rugumaho",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     url: "https://rugumaho.com",
     siteName: "Rugumaho",
     title: "Rugumaho — A Journal of Life, Motherhood & Discovery",
-    description: "Reflections on lifestyle, motherhood, travel, and personal growth. Thoughtful stories crafted for readers who seek depth, presence, and meaningful connection.",
+    description: "Discover stories on lifestyle, travel and wellness",
     images: [
       {
         url: "/profile.png",
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Rugumaho — A Journal of Life, Motherhood & Discovery",
-    description: "Reflections on lifestyle, motherhood, travel, and personal growth. Thoughtful stories crafted for readers who seek depth, presence, and meaningful connection.",
+    description: "Discover stories on lifestyle, travel and wellness",
     images: ["/profile.png"],
     creator: "@rugumaho",
   },
