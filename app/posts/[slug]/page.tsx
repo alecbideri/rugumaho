@@ -241,11 +241,11 @@ export default function BlogPostPage({ params }: PageProps) {
     );
   }
 
-  const authorInfo = post.author === "Ariane Rugumaho" ? {
-    name: "Ariane Rugumaho",
+  const authorInfo = post.author === "Ariane Rugumaho" || post.author === "Rugumaho" || !post.author ? {
+    name: "Rugumaho",
     avatar: "/profile.png",
-    bio: "Ariane is a Kigali-based travel writer and photographer dedicated to uncovering the soulful narratives of African heritage and landscape.",
-    handle: "@arianerugumaho"
+    bio: "Rugumaho is a communication professional and current student majoring in Strategic Communication with strong interest in travel, personal growth, and learning from others.",
+    handle: "@rugumaho"
   } : {
     name: post.author,
     avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuCCILgCbmO9BoZ92G-jMDt55p5rrjWEzCHEybwrHUFaadKeABiyJx-CV8PfeiZGAQSPQey_HKStW0YE7QtCocGyLkO33QA2Eb3tOPf2A3Ykq59390_y-f7a5703qvR6mIMqVYW0ubG85AsFASMx3ENhmQhmus0e248eRPYijWHE1ZC-ZfVjkKmZdTkJWaFCZewLfJb1QI2ilzZX3QnEDsZnqiHs7evHoaouTN6w85BsnH4OsJuA1pikvN89cj2Wck8OWb4__zvrgBg",
@@ -556,7 +556,12 @@ export default function BlogPostPage({ params }: PageProps) {
               <p className="mt-2 text-base text-slate-600">
                 {authorInfo.bio}
               </p>
-              <a className="mt-4 inline-block font-bold text-primary hover:underline" href="#">
+              <a 
+                className="mt-4 inline-block font-bold text-primary hover:underline" 
+                href="https://instagram.com/rugumaho"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Follow {authorInfo.handle}
               </a>
             </div>

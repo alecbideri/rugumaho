@@ -62,7 +62,7 @@ interface CategoryConfig {
 
 const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   all: {
-    tagline: "Exploring stories on Lifestyle, motherhood, Travel and more.",
+    tagline: "Reflections on lifestyle, motherhood, travel, and personal growth.",
     coverImage: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1200&q=80"
   },
   motherhood: {
@@ -70,20 +70,20 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
     coverImage: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=1200&q=80"
   },
   travel: {
-    tagline: "Exploring the world's quiet corners with heart and purpose.",
+    tagline: "Stories of travel, discovery, and human connection.",
     coverImage: "/covers/travel_category.png"
   },
   wellbeing: {
-    tagline: "Strength, endurance, and physical health for a vibrant lifestyle.",
-    coverImage: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1200&q=80"
+    tagline: "Practical reflections for staying grounded in a busy world.",
+    coverImage: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80"
   },
   fitness: {
-    tagline: "Strength, endurance, and physical health for a vibrant lifestyle.",
-    coverImage: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1200&q=80"
+    tagline: "Practical reflections for staying grounded in a busy world.",
+    coverImage: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80"
   },
   lifestyle: {
-    tagline: "Curated inspiration for sustainable daily practices and ethical choices.",
-    coverImage: "https://images.unsplash.com/photo-1511556532299-8f662fc26c06?auto=format&fit=crop&w=1200&q=80"
+    tagline: "Everyday rhythms.",
+    coverImage: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=80"
   }
 };
 

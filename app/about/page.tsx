@@ -26,7 +26,7 @@ export default function AboutPage() {
             "url": "https://rugumaho.com/about",
             "image": "https://rugumaho.com/profile.png",
             "sameAs": [
-              "https://instagram.com/arianerugumaho"
+              "https://instagram.com/rugumaho"
             ],
             "jobTitle": "Author & Creator",
             "worksFor": {
@@ -59,7 +59,7 @@ export default function AboutPage() {
             <span className="text-xs font-extrabold uppercase tracking-widest text-primary mb-6">Meet the Founder</span>
             <div className="text-slate-600 leading-relaxed text-base space-y-6 font-light">
               <p>
-                Ikaze! I’m Rugumaho. My name means &ldquo;it remains present,&rdquo; and in Rwandan culture, names are believed to reflect who we are.
+                Ikaze! I’m Rugumaho. My name means &ldquo;it remains present.&rdquo; In Rwandan culture, a name reflects who we are. Mine is a daily reminder to move through life with intention and stay rooted in the present.
               </p>
               <p>
                 I am guided by Ubuntu, an African concept that means &ldquo;I am because you are.&rdquo; It reminds me that we are deeply connected and that each of us is shaped by the wider community around us.
