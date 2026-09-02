@@ -341,6 +341,46 @@ export default function BlogPostPage({ params }: PageProps) {
     });
   };
 
+  // Helper to sanitize article HTML (strip MS Word <style> blocks, strip ghost empty paragraphs, and open links in new tab)
+  const sanitizeArticleHtml = (htmlContent: string) => {
+    let clean = htmlContent.replace(/<style[\s\S]*?<\/style>/gi, "");
+    clean = clean.replace(/<p[^>]*>\s*(?:<br\s*\/?>|&nbsp;|\s)*<\/p>/gi, "");
+    clean = clean.replace(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"([^>]*)>/gi, (match, href, rest) => {
+      if (rest.includes("target=")) return match;
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer"${rest}>`;
+    });
+    return clean;
+  };
+
+  // Helper to parse markdown links and open them in a new tab
+  const parseInlineLinks = (content: string) => {
+    const linkRegex = /\[(.*?)\]\((.*?)\)/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+    while ((match = linkRegex.exec(content)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(content.substring(lastIndex, match.index));
+      }
+      parts.push(
+        <a 
+          key={match.index} 
+          href={match[2]} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-primary hover:underline font-semibold"
+        >
+          {match[1]}
+        </a>
+      );
+      lastIndex = match.index + match[0].length;
+    }
+    if (lastIndex < content.length) {
+      parts.push(content.substring(lastIndex));
+    }
+    return parts.length > 0 ? parts : content;
+  };
+
   // Simple Markdown parsing for formatting paragraphs, headings, blockquotes, lists
   const renderContentBlocks = (text: string) => {
     const blocks = text.split(/\n\s*\n/);
@@ -369,7 +409,7 @@ export default function BlogPostPage({ params }: PageProps) {
             {items.map((item, i) => (
               <li key={i} className="flex items-start gap-3">
                 <span className="mt-2.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary"></span>
-                <span className="text-slate-750 text-lg">{item}</span>
+                <span className="text-slate-750 text-lg">{parseInlineLinks(item)}</span>
               </li>
             ))}
           </ul>
@@ -380,7 +420,7 @@ export default function BlogPostPage({ params }: PageProps) {
         return (
           <blockquote key={index} className="my-12 border-l-4 border-primary bg-slate-50/50 px-8 py-10 italic text-slate-900">
             <p className="font-serif text-2xl leading-relaxed">
-              {trimmed}
+              {parseInlineLinks(trimmed)}
             </p>
           </blockquote>
         );
@@ -393,7 +433,7 @@ export default function BlogPostPage({ params }: PageProps) {
           key={index} 
           className={`${isFirstParagraph ? "drop-cap mb-8 text-lg" : "mt-6"} text-slate-700 leading-[1.8]`}
         >
-          {trimmed}
+          {parseInlineLinks(trimmed)}
         </p>
       );
     });
@@ -446,7 +486,7 @@ export default function BlogPostPage({ params }: PageProps) {
       )}
       <Navbar />
 
-      {/* Floating Left Sidebar Social Actions */}
+      {/* Floating Left Sidebar Social Actions (Desktop) */}
       <aside className="fixed left-12 top-1/2 hidden -translate-y-1/2 flex-col gap-6 xl:flex z-40">
         <button 
           onClick={() => setIsShareModalOpen(true)}
@@ -468,15 +508,55 @@ export default function BlogPostPage({ params }: PageProps) {
         <div className="h-10 w-px bg-slate-100 self-center"></div>
         <button 
           onClick={() => {
-            if (typeof navigator !== "undefined") {
+            if (typeof window !== "undefined") {
               navigator.clipboard.writeText(window.location.href);
-              triggerToast("Story link copied to clipboard!");
+              setToast("Story link copied to clipboard!");
+              setTimeout(() => setToast(null), 3000);
             }
           }}
           className="group flex h-10 w-10 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm hover:border-primary transition-all cursor-pointer"
-          title="Copy Link"
+          title="Copy post link"
         >
           <LinkIcon className="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" />
+        </button>
+      </aside>
+
+      {/* Mobile Floating Action Bar (Pill at bottom for Share, Discuss, Copy) */}
+      <aside className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-4 py-2 rounded-full shadow-2xl border border-slate-200/80 dark:border-slate-800 xl:hidden transition-all duration-300">
+        <button 
+          onClick={() => setIsShareModalOpen(true)}
+          className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-primary py-1.5 px-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          aria-label="Share story"
+        >
+          <Share2 className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          <span>Share</span>
+        </button>
+        <div className="h-4 w-px bg-slate-200 dark:bg-slate-700"></div>
+        <button 
+          onClick={() => {
+            const elem = document.getElementById("comments-section");
+            if (elem) elem.scrollIntoView({ behavior: "smooth" });
+          }}
+          className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-primary py-1.5 px-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          aria-label="Jump to comments"
+        >
+          <MessageCircle className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          <span>Discuss ({comments.length})</span>
+        </button>
+        <div className="h-4 w-px bg-slate-200 dark:bg-slate-700"></div>
+        <button 
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              navigator.clipboard.writeText(window.location.href);
+              setToast("Story link copied to clipboard!");
+              setTimeout(() => setToast(null), 3000);
+            }
+          }}
+          className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-primary py-1.5 px-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          aria-label="Copy story link"
+        >
+          <LinkIcon className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          <span>Copy</span>
         </button>
       </aside>
 
@@ -535,7 +615,9 @@ export default function BlogPostPage({ params }: PageProps) {
           {post.content.trim().startsWith("<") || post.content.includes("</") ? (
             <div 
               className="wysiwyg-content text-slate-700 dark:text-slate-350"
-              dangerouslySetInnerHTML={{ __html: post.content }} 
+              dangerouslySetInnerHTML={{ 
+                __html: sanitizeArticleHtml(post.content)
+              }} 
             />
           ) : (
             renderContentBlocks(post.content)
@@ -558,7 +640,7 @@ export default function BlogPostPage({ params }: PageProps) {
               </p>
               <a 
                 className="mt-4 inline-block font-bold text-primary hover:underline" 
-                href="https://instagram.com/rugumaho"
+                href="https://www.instagram.com/rugumaho1?igsi=MWI0aHdpYnhuNWVlMg%3D%3D&utm_source=qr"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -574,7 +656,7 @@ export default function BlogPostPage({ params }: PageProps) {
             <h3 className="text-center font-serif text-3xl font-bold text-slate-900">You May Also Like</h3>
             <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {recommended.map((rec) => (
-                <Link key={rec.id} href={`/posts/${rec.slug}`} className="group cursor-pointer block">
+                <Link key={rec.id} href={`/posts/${rec.slug}`} className="group cursor-pointer block no-underline text-inherit">
                   <div className="aspect-[4/5] overflow-hidden rounded-xl bg-slate-50 border border-slate-100 relative">
                     <ImageWithPlaceholder
                       src={rec.coverImage || "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634"}
@@ -909,7 +991,7 @@ export default function BlogPostPage({ params }: PageProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setIsShareModalOpen(false)}
-                className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 rounded-xl transition-all font-semibold text-xs text-slate-700 dark:text-slate-350 cursor-pointer"
+                className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 rounded-xl transition-all font-semibold text-xs text-slate-700 dark:text-slate-350 cursor-pointer no-underline"
               >
                 <div className="size-8 rounded bg-black text-white flex items-center justify-center font-black">
                   X
@@ -923,7 +1005,7 @@ export default function BlogPostPage({ params }: PageProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setIsShareModalOpen(false)}
-                className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 rounded-xl transition-all font-semibold text-xs text-slate-700 dark:text-slate-350 cursor-pointer"
+                className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 rounded-xl transition-all font-semibold text-xs text-slate-700 dark:text-slate-350 cursor-pointer no-underline"
               >
                 <div className="size-8 rounded bg-[#1877F2] text-white flex items-center justify-center">
                   <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24">
@@ -954,7 +1036,7 @@ export default function BlogPostPage({ params }: PageProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setIsShareModalOpen(false)}
-                className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 rounded-xl transition-all font-semibold text-xs text-slate-700 dark:text-slate-350 cursor-pointer"
+                className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 rounded-xl transition-all font-semibold text-xs text-slate-700 dark:text-slate-350 cursor-pointer no-underline"
               >
                 <div className="size-8 rounded bg-[#25D366] text-white flex items-center justify-center font-bold text-xs">
                   WA
@@ -1018,7 +1100,7 @@ export default function BlogPostPage({ params }: PageProps) {
                 Close
               </button>
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/rugumaho1?igsi=MWI0aHdpYnhuNWVlMg%3D%3D&utm_source=qr"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setIsInstagramModalOpen(false)}

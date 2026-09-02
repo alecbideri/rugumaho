@@ -26,7 +26,7 @@ export default function AboutPage() {
             "url": "https://rugumaho.com/about",
             "image": "https://rugumaho.com/profile.png",
             "sameAs": [
-              "https://instagram.com/rugumaho"
+              "https://www.instagram.com/rugumaho1?igsi=MWI0aHdpYnhuNWVlMg%3D%3D&utm_source=qr"
             ],
             "jobTitle": "Author & Creator",
             "worksFor": {

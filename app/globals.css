@@ -33,6 +33,21 @@ body {
   font-family: var(--font-inter), sans-serif;
 }
 
+a {
+  text-decoration: none;
+}
+
+.wysiwyg-content a {
+  color: #A88F6D !important;
+  text-decoration: underline !important;
+  text-underline-offset: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.wysiwyg-content a:hover {
+  opacity: 0.8;
+}
+
 .drop-cap::first-letter {
   float: left;
   font-size: 5rem;
@@ -47,6 +62,17 @@ body {
 .wysiwyg-content,
 .wysiwyg-content * {
   font-family: var(--font-serif), serif !important;
+}
+
+.wysiwyg-content a {
+  color: #A88F6D !important;
+  text-decoration: underline !important;
+  text-underline-offset: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.wysiwyg-content a:hover {
+  opacity: 0.8;
 }
 
 .wysiwyg-content h2 {
@@ -66,9 +92,27 @@ body {
 }
 
 .wysiwyg-content p {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  margin-top: 1.15rem;
+  margin-bottom: 1.15rem;
   line-height: 1.8;
+}
+
+.wysiwyg-content p[class*="ListParagraph"],
+.wysiwyg-content p[class*="MsoList"],
+.wysiwyg-content p.MsoListParagraph {
+  margin-top: 0.4rem !important;
+  margin-bottom: 0.4rem !important;
+  line-height: 1.75;
+}
+
+.wysiwyg-content li {
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+  line-height: 1.75;
+}
+
+.wysiwyg-content p:empty {
+  display: none !important;
 }
 
 .wysiwyg-content blockquote {

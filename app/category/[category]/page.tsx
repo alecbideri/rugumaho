@@ -430,7 +430,7 @@ export default function CategoryPage({ params }: PageProps) {
                       {/* Card Body */}
                       <div className="p-6">
                         <h3 className="font-serif text-xl font-bold text-slate-900 mb-3 leading-snug group-hover:text-primary transition-colors">
-                          <Link href={`/posts/${post.slug}`}>
+                          <Link href={`/posts/${post.slug}`} className="no-underline text-inherit">
                             {post.title}
                           </Link>
                         </h3>
@@ -555,24 +555,13 @@ export default function CategoryPage({ params }: PageProps) {
                 <div className="flex gap-4 items-center px-2">
                   {/* Instagram Link */}
                   <a 
-                    href="https://instagram.com" 
+                    href="https://www.instagram.com/rugumaho1?igsi=MWI0aHdpYnhuNWVlMg%3D%3D&utm_source=qr" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="size-11 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-700 hover:text-white dark:hover:text-slate-900 hover:bg-slate-900 dark:hover:bg-white hover:border-slate-900 dark:hover:border-white transition-all cursor-pointer hover:scale-110 active:scale-95"
                     aria-label="Instagram"
                   >
                     <InstagramIcon className="w-5 h-5" />
-                  </a>
-
-                  {/* YouTube Link */}
-                  <a 
-                    href="https://youtube.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="size-11 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-700 hover:text-white dark:hover:text-slate-900 hover:bg-slate-900 dark:hover:bg-white hover:border-slate-900 dark:hover:border-white transition-all cursor-pointer hover:scale-110 active:scale-95"
-                    aria-label="YouTube"
-                  >
-                    <YoutubeIcon className="w-5 h-5" />
                   </a>
                 </div>
               </div>

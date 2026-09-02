@@ -336,7 +336,7 @@ export default function Home() {
                       <Link 
                         key={post.id} 
                         href={`/posts/${post.slug}`}
-                        className="flex flex-col gap-4 group cursor-pointer"
+                        className="flex flex-col gap-4 group cursor-pointer no-underline text-inherit"
                       >
                          <div className="overflow-hidden rounded-xl aspect-[4/3] relative">
                            <ImageWithPlaceholder

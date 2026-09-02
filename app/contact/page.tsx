@@ -207,22 +207,13 @@ export default function ContactPage() {
             {/* Flat Outlined Social Row */}
             <div className="flex gap-4 justify-center items-center pt-2">
               <a 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/rugumaho1?igsi=MWI0aHdpYnhuNWVlMg%3D%3D&utm_source=qr" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="size-11 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-700 hover:text-white dark:hover:text-slate-900 hover:bg-slate-900 dark:hover:bg-white hover:border-slate-900 dark:hover:border-white transition-all cursor-pointer hover:scale-110 active:scale-95" 
                 aria-label="Instagram"
               >
                 <InstagramIcon className="w-5 h-5" />
-              </a>
-              <a 
-                href="https://youtube.com" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="size-11 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-700 hover:text-white dark:hover:text-slate-900 hover:bg-slate-900 dark:hover:bg-white hover:border-slate-900 dark:hover:border-white transition-all cursor-pointer hover:scale-110 active:scale-95" 
-                aria-label="YouTube"
-              >
-                <YoutubeIcon className="w-5 h-5" />
               </a>
             </div>
           </div>

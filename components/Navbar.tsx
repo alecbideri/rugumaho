@@ -86,7 +86,7 @@ export default function Navbar() {
           <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
             <Link 
               href="/" 
-              className={`text-sm font-medium transition-colors ${
+              className={`text-sm font-medium transition-colors no-underline ${
                 pathname === "/" 
                   ? "text-primary border-b-2 border-primary" 
                   : "text-slate-600 hover:text-primary"
@@ -96,7 +96,7 @@ export default function Navbar() {
             </Link>
             <Link 
               href="/category/all" 
-              className={`text-sm font-medium transition-colors ${
+              className={`text-sm font-medium transition-colors no-underline ${
                 pathname.startsWith("/category/") 
                   ? "text-primary border-b-2 border-primary" 
                   : "text-slate-600 hover:text-primary"
@@ -106,7 +106,7 @@ export default function Navbar() {
             </Link>
             <Link 
               href="/about" 
-              className={`text-sm font-medium transition-colors ${
+              className={`text-sm font-medium transition-colors no-underline ${
                 pathname === "/about" 
                   ? "text-primary border-b-2 border-primary" 
                   : "text-slate-600 hover:text-primary"
@@ -116,7 +116,7 @@ export default function Navbar() {
             </Link>
             <Link 
               href="/contact" 
-              className={`text-sm font-medium transition-colors ${
+              className={`text-sm font-medium transition-colors no-underline ${
                 pathname === "/contact" 
                   ? "text-primary border-b-2 border-primary" 
                   : "text-slate-600 hover:text-primary"
@@ -206,7 +206,7 @@ export default function Navbar() {
           <Link 
             href="/" 
             onClick={() => setIsOpen(false)}
-            className={`block px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+            className={`block px-4 py-2 text-sm font-semibold rounded-lg transition-colors no-underline ${
               pathname === "/" 
                 ? "bg-primary/10 text-primary" 
                 : "text-slate-600 hover:bg-slate-50 hover:text-primary"
@@ -217,7 +217,7 @@ export default function Navbar() {
           <Link 
             href="/category/all" 
             onClick={() => setIsOpen(false)}
-            className={`block px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+            className={`block px-4 py-2 text-sm font-semibold rounded-lg transition-colors no-underline ${
               pathname.startsWith("/category/") 
                 ? "bg-primary/10 text-primary" 
                 : "text-slate-600 hover:bg-slate-50 hover:text-primary"
@@ -228,7 +228,7 @@ export default function Navbar() {
           <Link 
             href="/about" 
             onClick={() => setIsOpen(false)}
-            className={`block px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+            className={`block px-4 py-2 text-sm font-semibold rounded-lg transition-colors no-underline ${
               pathname === "/about" 
                 ? "bg-primary/10 text-primary" 
                 : "text-slate-600 hover:bg-slate-50 hover:text-primary"
@@ -239,7 +239,7 @@ export default function Navbar() {
           <Link 
             href="/contact" 
             onClick={() => setIsOpen(false)}
-            className={`block px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+            className={`block px-4 py-2 text-sm font-semibold rounded-lg transition-colors no-underline ${
               pathname === "/contact" 
                 ? "bg-primary/10 text-primary" 
                 : "text-slate-600 hover:bg-slate-50 hover:text-primary"
