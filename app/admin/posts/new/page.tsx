@@ -330,7 +330,7 @@ function NewPostEditor() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    triggerToast("Uploading image to ImageKit...");
+    triggerToast("Uploading image...");
     try {
       const base64 = await compressImage(file);
       const res = await uploadImageToImageKit(base64, file.name);
@@ -346,11 +346,11 @@ function NewPostEditor() {
         formatText("insertHTML", imgHTML);
         triggerToast("Image inserted successfully!");
       } else {
-        alert("ImageKit upload failed: " + (res.error || "Unknown error"));
+        alert("Image upload failed: " + (res.error || "Could not complete upload."));
       }
     } catch (err: any) {
       console.error(err);
-      alert("Failed to read and compress file: " + err.message);
+      alert(err.message || "Failed to process and upload image.");
     }
     // Reset file input value so same file can be uploaded again
     e.target.value = "";
@@ -425,12 +425,12 @@ function NewPostEditor() {
         setCoverImage(res.url);
         triggerToast("Cover image uploaded successfully!");
       } else {
-        alert("ImageKit upload failed: " + (res.error || "Unknown error"));
+        alert("Cover image upload failed: " + (res.error || "Could not complete upload."));
       }
     } catch (err: any) {
       console.error(err);
       setIsUploadingFeatured(false);
-      alert("Failed to read and compress file: " + err.message);
+      alert(err.message || "Failed to process and upload image.");
     }
     // Reset file input value so same file can be uploaded again
     e.target.value = "";

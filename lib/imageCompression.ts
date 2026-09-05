@@ -1,66 +1,107 @@
 /**
  * Compresses an image file on the client side using HTML5 Canvas.
- * Resizes the image if it exceeds 1600px in either dimension, and compresses to 82% JPEG quality.
+ * Resizes large images (up to 1400px) and compresses to ~78% JPEG quality,
+ * converting heavy 10-15MB phone photos into clean, lightweight ~200-350KB images.
  */
 export async function compressImage(file: File): Promise<string> {
+  const isHeic = 
+    file.name.toLowerCase().endsWith(".heic") || 
+    file.name.toLowerCase().endsWith(".heif") ||
+    file.type === "image/heic" || 
+    file.type === "image/heif";
+
   return new Promise((resolve, reject) => {
-    // If it's not an image, resolve with original File Reader base64
-    if (!file.type.startsWith("image/")) {
+    // If it's not an image MIME type
+    if (!file.type.startsWith("image/") && !isHeic) {
       const reader = new FileReader();
       reader.onload = (e) => resolve(e.target?.result as string);
-      reader.onerror = (err) => reject(err);
+      reader.onerror = () => reject(new Error("Unable to read the selected file."));
       reader.readAsDataURL(file);
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      if (!dataUrl) {
+        reject(new Error("Failed to read file data."));
+        return;
+      }
+
       const img = new Image();
       img.onload = () => {
-        const canvas = document.createElement("canvas");
-        let width = img.width;
-        let height = img.height;
+        try {
+          const canvas = document.createElement("canvas");
+          let width = img.naturalWidth || img.width;
+          let height = img.naturalHeight || img.height;
 
-        const MAX_WIDTH = 1600;
-        const MAX_HEIGHT = 1600;
+          const MAX_WIDTH = 1400;
+          const MAX_HEIGHT = 1400;
 
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height = Math.round(height * (MAX_WIDTH / width));
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width = Math.round(width * (MAX_HEIGHT / height));
+              height = MAX_HEIGHT;
+            }
           }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d", { alpha: false });
+          if (!ctx) {
+            resolve(dataUrl);
+            return;
           }
+
+          // Fill white background for transparent images converted to JPEG
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fillRect(0, 0, width, height);
+
+          // Draw and resize image onto canvas
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // High-efficiency JPEG at 78% quality
+          const compressedBase64 = canvas.toDataURL("image/jpeg", 0.78);
+          resolve(compressedBase64);
+        } catch (canvasErr) {
+          console.warn("Canvas compression failed, using direct dataUrl:", canvasErr);
+          resolve(dataUrl);
         }
+      };
 
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          resolve(e.target?.result as string); // Fallback to raw base64
+      img.onerror = () => {
+        if (isHeic) {
+          reject(
+            new Error(
+              "Apple HEIC image format detected. Please export or save this photo as a standard JPG or PNG before uploading."
+            )
+          );
           return;
         }
 
-        // Draw image onto canvas
-        ctx.drawImage(img, 0, 0, width, height);
+        if (file.size > 4 * 1024 * 1024) {
+          reject(
+            new Error(
+              `Image is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB) and could not be compressed in the browser. Please use a JPG or PNG under 4MB.`
+            )
+          );
+          return;
+        }
 
-        // Export to JPEG with 82% quality to achieve tiny sizes with excellent visual fidelity
-        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.82);
-        resolve(compressedBase64);
+        // Fallback to original reader if smaller image
+        resolve(dataUrl);
       };
-      img.onerror = () => {
-        // Fallback to original reader if Image load fails
-        const fallbackReader = new FileReader();
-        fallbackReader.onload = (evt) => resolve(evt.target?.result as string);
-        fallbackReader.readAsDataURL(file);
-      };
-      img.src = e.target?.result as string;
+
+      img.src = dataUrl;
     };
-    reader.onerror = (err) => reject(err);
+
+    reader.onerror = () => reject(new Error("Failed to read image file from your device."));
     reader.readAsDataURL(file);
   });
 }
